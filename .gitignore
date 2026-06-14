@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Data & labels (too large for git)
+videoattentiontarget/
+*.jsonl
+*.csv
+*.jpg
+*.png
+
+# Model weights & cache
+*.bin
+*.safetensors
+*.pt
+*.pth
+huggingface/
+.cache/
+
+# Pipeline outputs
+*.log
+*.jpg
+step1_sanity_check*.jpg
+step2_probe_results*.jpg
+
+# Progress files (machine-specific, regenerated on resume)
+progress_*.json
+
+# VS Code
+.vscode/
