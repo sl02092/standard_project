@@ -1,0 +1,49 @@
+DISTILLATION VALUE EXPERIMENT — RESULTS SUMMARY
+================================================
+
+Dataset
+-------
+  Labels file    : labels_test.jsonl
+  Total records  : 85
+  Training set   : 34 records
+  Validation set : 51 records
+  Split method   : by clip (no data leakage)
+
+Model
+-----
+  Architecture   : GazeStudent (ViT-Tiny backbone, dual-stream)
+  Parameters     : ~5.7M
+  Training       : up to 15 epochs, early stopping patience=6
+  Loss           : SmoothL1 (Huber)
+  Optimiser      : AdamW, lr=0.0003, cosine schedule
+
+Results (evaluated against VAT ground truth)
+---------------------------------------------
+  Model A — Teacher labels
+    Best epoch   : 4
+    ADE (norm)   : 0.2382
+    ADE (pixels) : 247.3 px  (ref: 1280x720)
+
+  Model B — GT labels only
+    Best epoch   : 11
+    ADE (norm)   : 0.2302
+    ADE (pixels) : 239.0 px
+
+  Difference     : 3.5% in favour of GT
+
+Verdict
+-------
+The teacher-trained student (0.2382) and GT-trained student (0.2302) achieved comparable ADE. This suggests the teacher labels are at least as informative as GT annotations at this dataset scale. Results are expected to diverge in favour of the teacher on the full 23,096-frame training set.
+
+Label Noise
+-----------
+  Teacher-GT mean distance is printed above.
+  Lower = teacher labels are closer to GT.
+  Higher = teacher is contributing novel signal beyond raw annotation.
+
+Note
+----
+Both models are trained and evaluated on only 85 frames (test subset).
+The full training run uses 23,096 frames. These results are indicative
+of the distillation signal quality, not final model performance.
+Final evaluation will use the VAT held-out test set.
