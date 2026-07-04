@@ -1,19 +1,24 @@
 """
-prompt_compare_dynamic.py — Context-aware A/B prompt evaluation.
-Dynamically scales prompt features based on actual occupants in the frame
-and implements Chain-of-Thought (CoT) reasoning order.
+step43d7_prompt_compare_dinov2_internvl38b.py — Context-aware A/B prompt evaluation 
+pairing DINOv2 dense image embeddings with the generative language decoder from 
+InternVL3-8B-hf via the trained MLP projection layer.
+
+This script implements a custom LLaVA-style inference pipeline structure
+for gaze target prediction.
 """
 
 import os
 import re
 import torch
+import torch.nn as nn
 from PIL import Image
-from transformers import AutoProcessor, AutoModelForImageTextToText
+from transformers import AutoModelForImageTextToText, AutoTokenizer, AutoProcessor, AutoModel
 
 # ── CONFIG ──────────────────────────────────────────────────────────────
-BASE_PATH      = r"C:\repo\standard_project\videoattentiontarget"
-MODEL_NAME     = "OpenGVLab/InternVL3-8B-hf"
-MAX_NEW_TOKENS = 200
+BASE_PATH       = r"C:\repo\standard_project\videoattentiontarget"
+DINO_MODEL_NAME = "facebook/dinov2-large"
+LLM_MODEL_NAME  = "OpenGVLab/InternVL3-8B-hf"
+MAX_NEW_TOKENS  = 50
 
 TARGET_FRAMES = [
     ("13525_13575", 13567, "s00"),
@@ -29,7 +34,7 @@ TARGET_FRAMES = [
     ("1650_1775",  1770, "s00"),
 ]
 
-# ── DYNAMIC PROMPT VARIANTS ─────────────────────────────────────────────
+#---
 
 def build_prompt_clean_baseline(img_w, img_h, primary_box, primary_label, others_with_labels):
     """An updated baseline that drops Person B completely if the subject is alone."""
@@ -165,17 +170,27 @@ where the object actually is - it is usually farther away than you might initial
     return prompt
 
 PROMPT_VARIANTS = {
-    "v_clean_baseline": build_prompt_clean_baseline, 
-    "v_dynamic_cot": build_prompt_dynamic_cot, 
-    "v_eye_pose_cot": build_prompt_eye_vs_pose_cot,
-    "v_dynamic_cot_viewer_perspective": build_prompt_dynamic_cot_viewer_perspective,    
+    #"V1_Direct": lambda w, h, box, lbl, others: f"Look at the person who is {lbl} at bounding box {box}. Predict their normalized gaze target coordinate as (X, Y) between 0.0 and 1.0.",
+    #"V2_Gaze_Follow": lambda w, h, box, lbl, others: f"Trace the line of sight vector from the eyes of {lbl}. Provide the coordinate (X, Y) where their gaze lands.",
+    "Baseline": build_prompt_clean_baseline,
 }
 
-# ── LOOKUP ENGINE ───────────────────────────────────────────────────────
+# ── MULTIMODAL PROJECTION ADAPTER LAYER ─────────────────────────────────
+class GazeMultimodalProjector(nn.Module):
+    def __init__(self, vision_dim, llm_dim):
+        super().__init__()
+        self.projector = nn.Sequential(
+            nn.Linear(vision_dim, llm_dim),
+            nn.GELU(),
+            nn.Linear(llm_dim, llm_dim),
+            nn.LayerNorm(llm_dim)  # Add this layer in the eval script too!
+        )
+        
+    def forward(self, x):
+        return self.projector(x)
 
+# ── DATASET LOOKUP ENGINE ───────────────────────────────────────────────
 def find_dir_by_clip_id(root_path, clip_id):
-    """Exact match on directory name, not substring — avoids matching
-    '650_1775' inside '1650_1775' or similar partial-string collisions."""
     target = str(clip_id).strip()
     for root, dirs, _ in os.walk(root_path):
         for d in dirs:
@@ -183,11 +198,7 @@ def find_dir_by_clip_id(root_path, clip_id):
                 return os.path.join(root, d)
     return None
 
-
 def parse_txt_file_for_frame(filepath, frame_num):
-    """Exact frame-number match only. The previous version had a fallback
-    that matched on the last two digits of the filename, which could
-    silently return data from a completely different frame."""
     target_idx = int(frame_num)
     if not os.path.exists(filepath):
         return None
@@ -215,14 +226,17 @@ def parse_txt_file_for_frame(filepath, frame_num):
 def resolve_context(clip, frame_num, subject):
     ann_dir = find_dir_by_clip_id(os.path.join(BASE_PATH, "annotations"), clip)
     img_dir = find_dir_by_clip_id(os.path.join(BASE_PATH, "images"), clip)
-    if not ann_dir or not img_dir: return None
+    if not ann_dir or not img_dir:
+        return None
 
     subj_file = f"{subject}.txt"
     primary_data = parse_txt_file_for_frame(os.path.join(ann_dir, subj_file), frame_num)
-    if not primary_data: return None
+    if not primary_data:
+        return None
 
     img_path = os.path.join(img_dir, primary_data["fname_actual"])
-    if not os.path.exists(img_path): return None
+    if not os.path.exists(img_path):
+        return None
 
     others = []
     for f in os.listdir(ann_dir):
@@ -232,48 +246,120 @@ def resolve_context(clip, frame_num, subject):
                 others.append((f.replace(".txt", ""), sib_data))
     return {"img_path": img_path, "primary": primary_data, "others": others}
 
-def parse_gaze_xy(text):
-    if not text or not text.strip(): 
-        return None, None
-        
-    # Catches the traditional flag or the new text-token indicator flags safely
-    if (re.search(r"GAZE_XY:\s*\(-1\s*,\s*-1\)", text, re.IGNORECASE) or 
-        re.search(r"GAZE_XY:\s*\(\s*OFF\s*,\s*OFF\s*\)", text, re.IGNORECASE) or
-        re.search(r"Is_Off_Screen:\s*Yes", text, re.IGNORECASE)): 
+# ── PARSING LOGIC ───────────────────────────────────────────────────────
+def parse_gaze_xy(response_str):
+    if "off-screen" in response_str.lower():
         return -1.0, -1.0
-        
-    match = re.search(r"GAZE_XY:\s*\(\s*([0-9]*\.?[0-9]+)\s*,\s*([0-9]*\.?[0-9]+)\s*\)", text, re.IGNORECASE)
-    if match: 
-        return max(0.0, min(1.0, float(match.group(1)))), max(0.0, min(1.0, float(match.group(2))))
-        
+    match = re.search(r"([\d.]+)\s*,\s*([\d.]+)", response_str)
+    if match:
+        try:
+            return float(match.group(1)), float(match.group(2))
+        except ValueError:
+            pass
     return None, None
 
-
-# ── RUNTIME ENGINE ───────────────────────────────────────────────────────
-
-def main():
-    print(f"Loading model architecture: {MODEL_NAME}")
-    processor = AutoProcessor.from_pretrained(MODEL_NAME)
-    model = AutoModelForImageTextToText.from_pretrained(MODEL_NAME, torch_dtype=torch.float16, device_map="cuda").eval()
-    pad_token_id = getattr(processor.tokenizer, 'pad_token_id', None) or processor.tokenizer.eos_token_id
-    print("Model ready.\n")
-
-    for clip, frame_num, subject in TARGET_FRAMES:
-        print("=" * 80)
-        print(f"TARGET: Clip {clip} | Frame {frame_num} | Subject {subject}")
+# ── HYBRID INFERENCE PIPELINE ───────────────────────────────────────────
+def run_custom_hybrid_inference(img_raw, prompt_text, dino_processor, dino_model, llm_tokenizer, llm_model, full_vlm, proj_head):
+    # 1. Extract visual features using DINOv2
+    inputs_dino = dino_processor(images=img_raw, return_tensors="pt").to(dino_model.device)
+    with torch.inference_mode():
+        dino_outputs = dino_model(**inputs_dino)
+        image_features = dino_outputs.last_hidden_state[:, 1:, :]
         
-        context = resolve_context(clip, frame_num, subject)
-        if not context:
-            print(f"SKIP — Lookup failure processing frame context.")
-            continue
+    # 2. Map visual features into the LLM's embedding space dimension via Projection Head
+    projected_vis_embeds = proj_head(image_features.to(torch.bfloat16))
+    
+    # 3. Process text prompt and grab token embeddings
+    text_inputs = llm_tokenizer(prompt_text, return_tensors="pt").to(llm_model.device)
+    
+    embed_layer = llm_model.get_input_embeddings() if hasattr(llm_model, "get_input_embeddings") else llm_model.model.embed_tokens
+    text_embeds = embed_layer(text_inputs.input_ids)
+        
+    # 4. Concatenate vision patches and prompt text embeddings
+    inputs_embeds = torch.cat([projected_vis_embeds, text_embeds], dim=1).to(torch.bfloat16)
+    
+    # 5. Step-by-step autoregressive generation using the top-level VLM language head
+    generated_ids = []
+    with torch.inference_mode():
+        for _ in range(MAX_NEW_TOKENS):
+            outputs = llm_model(inputs_embeds=inputs_embeds)
+            hidden_states = outputs.last_hidden_state
+            
+            # Map the final hidden state token representation through the lm_head
+            next_token_logits = full_vlm.lm_head(hidden_states[:, -1, :])
+            next_token_id = torch.argmax(next_token_logits, dim=-1)
+            
+            generated_ids.append(next_token_id.item())
+            
+            if next_token_id.item() == llm_tokenizer.eos_token_id:
+                break
+                
+            # Append the newly predicted token to the embedding sequence stream
+            next_token_embed = embed_layer(next_token_id.unsqueeze(0))
+            inputs_embeds = torch.cat([inputs_embeds, next_token_embed], dim=1)
+        
+    return llm_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
 
+# ── MAIN EXECUTIVE ──────────────────────────────────────────────────────
+def main():
+    print(f"[*] Loading Vision Backbone: {DINO_MODEL_NAME}...")
+    dino_processor = AutoProcessor.from_pretrained(DINO_MODEL_NAME)
+    dino_model = AutoModel.from_pretrained(DINO_MODEL_NAME, torch_dtype=torch.bfloat16, device_map="cuda:0")
+
+    print(f"[*] Loading VLM to extract language decoder: {LLM_MODEL_NAME}...")
+    full_vlm = AutoModelForImageTextToText.from_pretrained(
+        LLM_MODEL_NAME,
+        torch_dtype=torch.bfloat16,
+        trust_remote_code=True,
+        device_map="auto"
+    )
+    
+    # Extract the foundational text decoder assembly and tokenizer
+    llm_model = full_vlm.model.language_model
+    llm_tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_NAME, trust_remote_code=True)
+    
+    # Define linear projection adapter bridging the model dimensional layers
+    dino_dim = dino_model.config.hidden_size      
+    llm_dim = llm_model.config.hidden_size        
+    
+    # Instantiate the Projector matching your training layout
+    proj_head = GazeMultimodalProjector(dino_dim, llm_dim).to("cuda:0", dtype=torch.bfloat16)
+    
+    # Automatically load the trained weights matrix saved from train_step43d7_hybrid.py
+    weight_path = os.path.join(BASE_PATH, "dino_internvl_projector.pt")
+    if os.path.exists(weight_path):
+        print(f"[+] Loading trained projection weights matrix from: {weight_path}")
+        proj_head.load_state_dict(torch.load(weight_path, map_location="cuda:0"))
+    else:
+        print(f"[-] WARNING: Trained projection weight file not found at {weight_path}. Running with uninitialized states.")
+        
+    proj_head.eval().requires_grad_(False)
+    dino_model.eval().requires_grad_(False)
+    llm_model.eval().requires_grad_(False)
+
+    print("\n[+] Hybrid Engine loaded successfully. Running evaluation...\n")
+    print(f"{'Frame / Subject':<28} | {'Variant':<15} | {'GT (Norm)':<18} | {'Pred (Norm)':<18} | {'Output String'}")
+    print("-" * 130)
+
+    for seq_dir, frame_idx, subject_id in TARGET_FRAMES:
+        context = resolve_context(seq_dir, frame_idx, subject_id)
+        if not context:
+            continue
+            
         img_raw = Image.open(context["img_path"]).convert("RGB")
         img_w, img_h = img_raw.size
-
         p = context["primary"]
+        
         primary_box = (int(p["head_x1"]), int(p["head_y1"]), int(p["head_x2"]), int(p["head_y2"]))
         
-        all_subjects = [(subject, p)] + context["others"]
+        # Ground Truth normalization calculation
+        if p["gaze_x"] != -1 and p["gaze_y"] != -1:
+            gt_str = f"({p['gaze_x']/img_w:.3f}, {p['gaze_y']/img_h:.3f})"
+        else:
+            gt_str = "off-screen"
+            
+        # Screen space sorting for spatial labels
+        all_subjects = [(subject_id, p)] + context["others"]
         all_subjects.sort(key=lambda x: x[1]["head_x1"])
         ordered_ids = [s[0] for s in all_subjects]
         n_total = len(ordered_ids)
@@ -286,40 +372,29 @@ def main():
             if idx == n_total - 1: return "the person on the right"
             return "the person in the centre"
 
-        primary_label = get_spatial_label(subject)
-        other_boxes_with_labels = [((int(s[1]["head_x1"]), int(s[1]["head_y1"]), int(s[1]["head_x2"]), int(s[1]["head_y2"])), get_spatial_label(s[0])) for s in all_subjects if s[0] != subject]
+        primary_label = get_spatial_label(subject_id)
+        other_boxes_with_labels = [
+            ((int(s[1]["head_x1"]), int(s[1]["head_y1"]), int(s[1]["head_x2"]), int(s[1]["head_y2"])), get_spatial_label(s[0]))
+            for s in all_subjects if s[0] != subject_id
+        ]
 
-        gt_x = p["gaze_x"] / img_w if p["gaze_x"] != -1 else None
-        gt_y = p["gaze_y"] / img_h if p["gaze_y"] != -1 else None
-        print(f"  Frame File     : {p['fname_actual']}")
-        print(f"  Presence Count : 1 person found" if not other_boxes_with_labels else f"  Presence Count : {len(all_subjects)} people found")
-        print(f"  Ground Truth   : ({gt_x:.3f}, {gt_y:.3f})" if gt_x is not None else "  Ground Truth   : off-screen")
+        frame_label = f"{seq_dir}/{frame_idx} ({subject_id})"
 
         for variant_name, build_fn in PROMPT_VARIANTS.items():
             prompt_text = build_fn(img_w, img_h, primary_box, primary_label, other_boxes_with_labels)
-            messages = [{"role": "user", "content": [{"type": "image", "image": img_raw}, {"type": "text", "text": prompt_text}]}]
-            inputs = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.float16)
             
-            with torch.inference_mode():
-                output_ids = model.generate(
-                    **inputs, 
-                    max_new_tokens=MAX_NEW_TOKENS, 
-                    do_sample=False,
-                    pad_token_id=pad_token_id
-                )
+            response = run_custom_hybrid_inference(
+                img_raw, prompt_text,
+                dino_processor, dino_model,
+                llm_tokenizer, llm_model, full_vlm,
+                proj_head
+            )
             
-            response = processor.batch_decode(output_ids[:, inputs["input_ids"].shape[1]:], skip_special_tokens=True)[0].strip()
             pred_x, pred_y = parse_gaze_xy(response)
+            pred_str = f"({pred_x:.3f}, {pred_y:.3f})" if pred_x is not None else "Unparsed Text"
             
-            if pred_x == -1.0 and pred_y == -1.0:
-                coord_str = "off-screen (-1, -1)"
-            elif pred_x is not None and pred_y is not None:
-                coord_str = f"({pred_x:.3f}, {pred_y:.3f})"
-            else:
-                coord_str = "PARSING ERROR"
-                
-            print(f"\n    [{variant_name}] PRED COORDS : {coord_str}")
-            print(f"    [{variant_name}] MODEL TEXT  : {response.replace('\n', ' | ')}")
+            clean_res = response.replace("\n", " ")
+            print(f"{frame_label:<28} | {variant_name:<15} | {gt_str:<18} | {pred_str:<18} | {clean_res}")
 
 if __name__ == "__main__":
     main()

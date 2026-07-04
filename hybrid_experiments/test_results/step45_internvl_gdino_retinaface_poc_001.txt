@@ -1,0 +1,40 @@
+17742_17893/17826 (s00)      | man                          | 0.259      | 0.453      | -0.194 worse
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+10239_10740/10270 (s01)      | woman on the left            | 0.570      | 0.535      | +0.035 better
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+14250_14430/14250 (s01)      | newspaper                    | 0.023      | 0.145      | -0.122 worse
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+19636_19829/19658 (s00)      | woman in the white dress     | 0.040      | 0.226      | -0.186 worse
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+1710_1890/1737 (s02)         | person in the gray suit      | 0.281      | 0.135      | +0.145 better
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+1348_1469/1382 (s00)         | person on the right          | 0.331      | 0.465      | -0.134 worse
+----------------------------------------------------------------------------------------------------
+
+
+Notes:
+Good, honest result — and worth sitting with rather than glossing over: face refinement made things worse overall.
+Aggregate: 0.2507 (box-centroid) → 0.3265 (face-refined) — that's roughly a 30% increase in error, not the improvement the hypothesis predicted. Per-frame: 2 of 6 got better, 4 got worse, and the "better" cases weren't dramatically better while some "worse" cases were quite bad (man: −0.194, woman in the white dress: −0.186).
+Two things this disproves, and I want to be direct about the first one since it's my mistake:
+
+I claimed Stage 3 would be a "safe no-op" for object frames — that's wrong, and the newspaper result proves it. newspaper went from 0.023 (excellent) to 0.145 — a real regression, on an object, not a person. That means RetinaFace found a face somewhere in that crop despite the target being a newspaper. In busy multi-person TV/film scenes (exactly VAT's domain), a GDINO box — even a reasonably accurate one — can still contain a bystander's face nearby, especially once padded 15%. "Any face in the crop" isn't actually a safe signal in socially dense scenes. I shouldn't have asserted that as safe without testing it, and now we have direct evidence it isn't.
+The bigger question this raises: was the original hypothesis about why box-centroid underperforms even correct? I'd assumed GT sits near head/face level for person targets, based on the earlier production sample (GT y≈0.92, predictions clustering y≈0.61). But look at what happened on that exact clip here: face-refined moved the prediction to 0.465 — worse than box-centroid's 0.331. If GT is genuinely down near the bottom of frame, and a face detector naturally centers on the head (typically the top portion of a person's body box), refining toward the face moves the prediction further from GT, not closer. That's consistent with what we're seeing across most frames.
+
+That points to a real possibility worth checking before doing anything else with this: VAT's "attended target" annotation may not consistently mark the target person's face. Chong et al.'s annotation convention for person-targets may place the coordinate wherever the annotator judged the subject's gaze to land on the target's visible body — which could be their hands, torso, or elsewhere, not reliably the face. If that's true, "refine toward a face" is solving for an assumption the data doesn't actually support, and box-centroid's rougher whole-body estimate is a better structural match to how GT is actually distributed.
+Cheap way to check this before investing more time: pull up a handful of person-target frames' raw annotation crosshairs (literally your original Step 1 sanity-check tool) and just look — do the crosshairs cluster near visible faces, or land elsewhere on the body? That's a five-minute visual check that would tell you whether this mitigation has any legs at all, versus continuing to iterate blind.
+My recommendation given where you're at today: treat this as a closed negative result for now, same spirit as Mitigation 1 — document it (the aggregate numbers, the newspaper contamination case, and the hypothesis about GT placement) as a limitation you investigated and why it didn't pan out, rather than sinking more of today into it. It's a legitimate, citable finding either way. Given the full hybrid run is still your actual Objective 2 evidence and you've got papers to read this afternoon, I'd park this here unless the quick visual GT check makes you want to pursue it further.
+
+
+
+Also:
+That last point is the key one — it turns "possible explanation" into a confirmed mechanism.
+woman in the white dress — this actually resolves the uncertainty from my last message. You already know the GT target here is the outstretched hand, not the face. That's not a plausible theory anymore, it's a demonstrated case: face-refinement moved the prediction toward the face and away from GT (0.040 → 0.226, the second-worst regression in the set) precisely because GT isn't at the face for this frame. That's clean, citable evidence for the "VAT person-target GT doesn't reliably mark the face" explanation — worth quoting directly in the writeup as the concrete example, since you can point at the annotation and say exactly where it points instead of a face.
+woman on the left — good catch, and this is a separate, real finding. InternVL3 got the perspective backwards despite DESCRIBE_PROMPT explicitly stating "Location hints should be based on the image viewer's perspective." That's a subject-relative vs. viewer-relative confusion — a known failure mode for VLMs on spatial language, and worth noting separately from the face-refinement question. It's also probably why that frame's box-centroid distance (0.570) was already the worst in the set, well above the others (0.023–0.331) — GDINO likely grounded to the wrong side of the frame because the phrase itself pointed the wrong way. So this frame's problem started at Stage 1, not Stage 3 — worth keeping that distinction in the writeup rather than folding it into the face-refinement finding.
+person on the right — plausible contamination path, not confirmed, but fits the newspaper pattern. Three foreground people plus a background group gives RetinaFace several candidate faces inside a padded crop; "highest confidence" doesn't have any spatial awareness of which person was the actual identified target, it just picks whichever face scored best. Combined with newspaper, that's now two of six frames where crowd density plausibly pulled the wrong face into the crop — a real structural weakness of "crop and pick highest-confidence face," not a one-off.
+Net effect on the writeup: you now have three distinct, separable findings rather than one blob:
+
+Face-refinement regresses when GT targets a non-face body part (white dress, demonstrated directly)
+Face-refinement is vulnerable to crowd contamination in dense scenes (newspaper, person on right, plausible)
+A viewer/subject-perspective confusion in InternVL3 identification, independent of the face-refinement question (woman on left)
+
+That's a stronger negative result than "it didn't help" — it's "it didn't help, and here's the specific mechanism for two separate reasons," which is a better thing to have in Chapter on methodology/limitations than a flat null result. I'd still park it here per the earlier plan

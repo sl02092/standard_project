@@ -1,7 +1,29 @@
 """
-prompt_compare_dynamic.py — Context-aware A/B prompt evaluation.
-Dynamically scales prompt features based on actual occupants in the frame
-and implements Chain-of-Thought (CoT) reasoning order.
+prompt_compare_dynamic_v5.py — Context-aware A/B prompt evaluation.
+Extends step43d6 by adding the v5 "universal" prompt candidate, and adds
+explicit support for a held-out set of multi-person OBJECT-gaze frames —
+the specific combination not covered by the original TARGET_FRAMES list,
+and the combination where production labelling shows the largest measured
+error (mean distance ~0.436 on object-gaze frames, vs ~0.08-0.15 on social
+frames, per labels_full.jsonl analysis).
+
+HOW TO POPULATE NEW_MULTIPERSON_OBJECT_FRAMES (see below):
+    Run this against your real labels_full.jsonl to find candidates:
+
+        import json
+        candidates = []
+        with open("labels_full.jsonl") as f:
+            for line in f:
+                row = json.loads(line)
+                if row.get("gaze_type") == "object" and row.get("label_source") == "teacher":
+                    candidates.append(row)
+        # Then cross-reference against frame_manifest.csv or clip_selected.csv
+        # to find which of these clips have n_subjects > 1 (multi-person),
+        # and pick a handful of (clip, frame_idx/fname, subject) tuples.
+
+    Fill in NEW_MULTIPERSON_OBJECT_FRAMES below with real (clip, frame_num, subject)
+    tuples once identified — placeholders are marked clearly and the script
+    will skip/warn on any it can't resolve, rather than failing silently.
 """
 
 import os
@@ -11,11 +33,14 @@ from PIL import Image
 from transformers import AutoProcessor, AutoModelForImageTextToText
 
 # ── CONFIG ──────────────────────────────────────────────────────────────
-BASE_PATH      = r"C:\repo\standard_project\videoattentiontarget"
+BASE_PATH      = os.environ.get("VAT_BASE_PATH", r"C:\repo\standard_project\videoattentiontarget")
 MODEL_NAME     = "OpenGVLab/InternVL3-8B-hf"
 MAX_NEW_TOKENS = 200
 
-TARGET_FRAMES = [
+# ── Original step43d6 target frames (kept for direct comparability against
+#    the four previously-tested variants — solo off-screen, solo object,
+#    multi-person off-screen, multi-person social) ──────────────────────
+ORIGINAL_TARGET_FRAMES = [
     ("13525_13575", 13567, "s00"),
     ("13525_13575", 13570, "s00"),
     ("13525_13575", 13575, "s00"),
@@ -29,16 +54,30 @@ TARGET_FRAMES = [
     ("1650_1775",  1770, "s00"),
 ]
 
-# ── DYNAMIC PROMPT VARIANTS ─────────────────────────────────────────────
+# ── NEW: held-out multi-person OBJECT-gaze frames ───────────────────────
+# This is the combination NOT covered above, and the combination where
+# production error is largest. PLACEHOLDERS — replace with real
+# (clip, frame_num, subject) tuples pulled from labels_full.jsonl
+# (gaze_type == "object", label_source == "teacher") cross-referenced
+# against clip_selected.csv for n_subjects > 1.
+NEW_MULTIPERSON_OBJECT_FRAMES = [
+    # ("CLIP_ID_HERE", FRAME_NUM_HERE, "SUBJECT_HERE"),
+    # ("CLIP_ID_HERE", FRAME_NUM_HERE, "SUBJECT_HERE"),
+    # ("CLIP_ID_HERE", FRAME_NUM_HERE, "SUBJECT_HERE"),
+]
+
+TARGET_FRAMES = ORIGINAL_TARGET_FRAMES + NEW_MULTIPERSON_OBJECT_FRAMES
+
+# ── EXISTING PROMPT VARIANTS (unchanged from step43d6) ──────────────────
 
 def build_prompt_clean_baseline(img_w, img_h, primary_box, primary_label, others_with_labels):
     """An updated baseline that drops Person B completely if the subject is alone."""
     ax1, ay1, ax2, ay2 = primary_box
     na = (round(ax1/img_w,3), round(ay1/img_h,3), round(ax2/img_w,3), round(ay2/img_h,3))
-    
+
     prompt = f"Gaze estimation task. Image: {img_w}x{img_h}px.\n"
     prompt += f"PERSON A (predict gaze): head box (normalised) ({na[0]},{na[1]}) to ({na[2]},{na[3]})\n"
-    
+
     if others_with_labels:
         b, lbl = others_with_labels[0]
         b_cx = round((b[0] + b[2]) / 2 / img_w, 3)
@@ -46,8 +85,7 @@ def build_prompt_clean_baseline(img_w, img_h, primary_box, primary_label, others
         prompt += f"PERSON B (other person): head box px ({b[0]},{b[1]}) to ({b[2]},{b[3]}), face centre ({b_cx},{b_cy})\n"
     else:
         prompt += "PERSON B (other person): None present in frame.\n"
-    
-    # REWRITTEN SECTION: Forcing text representation over negative values
+
     prompt += """\nYOUR FIRST LINE MUST BE IN THIS EXACT FORMAT:
 GAZE_XY: (x, y)
 
@@ -62,15 +100,15 @@ If you know the person is looking offscreen, return offscreen. if you know the p
 Don't just give mid-screen coords, think about where the object actually is, don't just guess"""
     return prompt
 
-# fixes off-screen
+
 def build_prompt_dynamic_cot(img_w, img_h, primary_box, primary_label, others_with_labels):
     """Forces the model to explicitly perceive the context and think out loud first."""
     ax1, ay1, ax2, ay2 = primary_box
     na = (round(ax1/img_w,3), round(ay1/img_h,3), round(ax2/img_w,3), round(ay2/img_h,3))
-    
+
     prompt = f"Gaze estimation task. Image: {img_w}x{img_h}px.\n"
     prompt += f"SUBJECT (predict gaze for): {primary_label}, head box (normalised) ({na[0]},{na[1]}) to ({na[2]},{na[3]})\n"
-    
+
     if others_with_labels:
         prompt += "OTHER PEOPLE IN FRAME:\n"
         for b, lbl in others_with_labels:
@@ -79,8 +117,7 @@ def build_prompt_dynamic_cot(img_w, img_h, primary_box, primary_label, others_wi
             prompt += f" - {lbl}: head box px ({b[0]},{b[1]})-({b[2]},{b[3]}), face centre ({b_cx},{b_cy})\n"
     else:
         prompt += "OTHER PEOPLE IN FRAME: None. This person is alone in this scene.\n"
-    
-    # REWRITTEN SECTION: Structured analysis steps to transition weights
+
     prompt += """\nAnalysis Steps:
 1. Examine the subject's face orientation and precise eye/pupil direction.
 2. Check if the vector of their eye gaze points entirely outside the visible image frame boundaries.
@@ -96,14 +133,15 @@ Don't just give mid-screen coords, think about where the object actually is, don
 
     return prompt
 
+
 def build_prompt_eye_vs_pose_cot(img_w, img_h, primary_box, primary_label, others_with_labels):
     """Explicitly checks for head rotation discrepancies vs where the eyes look."""
     ax1, ay1, ax2, ay2 = primary_box
     na = (round(ax1/img_w,3), round(ay1/img_h,3), round(ax2/img_w,3), round(ay2/img_h,3))
-    
+
     prompt = f"Fine-grained gaze tracking. Image: {img_w}x{img_h}px.\n"
     prompt += f"Target Individual: {primary_label}, head region ({na[0]},{na[1]}) to ({na[2]},{na[3]})\n"
-    
+
     if others_with_labels:
         prompt += "Other visible people:\n"
         for b, lbl in others_with_labels:
@@ -112,8 +150,7 @@ def build_prompt_eye_vs_pose_cot(img_w, img_h, primary_box, primary_label, other
             prompt += f" - {lbl}: face centre ({b_cx},{b_cy})\n"
     else:
         prompt += "Other visible people: None.\n"
-    
-    # REWRITTEN SECTION: Explicit formatting rules matching textual awareness
+
     prompt += """\nInstructions:
 - Disregard the overall angle of the head if the eyeballs are shifted. Isolate the precise glance direction of their pupils.
 - Determine if the gaze vector stays inside the image frame or breaks out of the bounds (off-screen).
@@ -128,6 +165,7 @@ If you know the person is looking offscreen, return offscreen. if you know the p
 Don't just give mid-screen coords, think about where the object actually is, don't just guess"""
     return prompt
 
+
 def build_prompt_dynamic_cot_viewer_perspective(img_w, img_h, primary_box, primary_label, others_with_labels):
     """Same as build_prompt_dynamic_cot, but explicitly fixes the frame of
     reference to the viewer/camera, not the subject's own left/right."""
@@ -135,7 +173,6 @@ def build_prompt_dynamic_cot_viewer_perspective(img_w, img_h, primary_box, prima
     na = (round(ax1/img_w,3), round(ay1/img_h,3), round(ax2/img_w,3), round(ay2/img_h,3))
 
     prompt = f"Gaze estimation task. Image: {img_w}x{img_h}px.\n"
-    #prompt += f"SUBJECT (predict gaze for): {primary_label}, head box (normalised) ({na[0]},{na[1]}) to ({na[2]},{na[3]})\n"
     prompt += f"SUBJECT (predict gaze for): {primary_label}, head box ({na[0]},{na[1]}) to ({na[2]},{na[3]})\n"
     prompt += "IMPORTANT: All directions (left/right) in your reasoning must be described from the VIEWER'S perspective (as seen on screen), NOT the subject's own left/right.\n"
     prompt += "IMPORTANT: If the subjects head is rotated towards the left side of the image, say the head is orientated left. If the subjects head is rotated towards the right side of the image, say the head is orientated right.\n"
@@ -164,14 +201,70 @@ object before providing coordinates. Don't just give mid-screen coordinates — 
 where the object actually is - it is usually farther away than you might initially think."""
     return prompt
 
+
+# ── NEW: v5 "Universal" prompt candidate ────────────────────────────────
+
+def build_universal_gaze_prompt(img_w, img_h, primary_box, primary_label, others_with_labels):
+    """
+    Universal Benchmarking Prompt (v5).
+    Enforces a standardized coordinate space, handles N-body social context,
+    and leverages deductive reasoning tokens to minimize head orientation bias.
+
+    NOTE: structurally this uses the same Reasoning -> Is_Off_Screen -> GAZE_XY
+    schema as build_prompt_dynamic_cot, which in the step43d6 test correctly
+    detected off-screen ONLY on solo-subject frames and failed on every
+    multi-person off-screen frame. This variant should be specifically
+    checked against the NEW_MULTIPERSON_OBJECT_FRAMES set below to see
+    whether the additional compliance language actually changes that
+    behaviour, rather than assumed to fix it.
+    """
+    ax1, ay1, ax2, ay2 = primary_box
+    na = (round(ax1/img_w, 3), round(ay1/img_h, 3), round(ax2/img_w, 3), round(ay2/img_h, 3))
+
+    prompt = f"TASK: Gaze Tracking and Spatial Grounding. Image Dimensions: {img_w}x{img_h}px.\n"
+    prompt += f"TARGET SUBJECT (Predict gaze for): {primary_label} | Head Box (Normalized): [{na[0]}, {na[1]}, {na[2]}, {na[3]}]\n"
+
+    if others_with_labels:
+        prompt += "OTHER PEOPLE IN FRAME:\n"
+        for b, lbl in others_with_labels:
+            nb_x1 = round(b[0] / img_w, 3)
+            nb_y1 = round(b[1] / img_h, 3)
+            nb_x2 = round(b[2] / img_w, 3)
+            nb_y2 = round(b[3] / img_h, 3)
+            b_cx  = round((nb_x1 + nb_x2) / 2, 3)
+            b_cy  = round((nb_y1 + nb_y2) / 2, 3)
+            prompt += f" - {lbl}: Head Box [{nb_x1}, {nb_y1}, {nb_x2}, {nb_y2}] | Face Centre: ({b_cx}, {b_cy})\n"
+    else:
+        prompt += "OTHER PEOPLE IN FRAME: None. Target subject is alone in the scene.\n"
+
+    prompt += """
+ANALYSIS PROTOCOL:
+1. Focus entirely on the target subject's precise eye/pupil direction. Do not rely on macro head orientation if it points away from the eyes.
+2. Formulate a trajectory vector from the eyes. Determine if it cross-references any noted face center or traces completely out of the image boundaries.
+3. If looking at an unlisted object, localize the exact spatial region of that object first.
+
+REQUIRED RESPONSE SCHEMA:
+Reasoning: [1-2 sentences of step-by-step spatial tracking analysis]
+Is_Off_Screen: [Yes or No]
+GAZE_XY: (x, y)
+
+CRITICAL COMPLIANCE RULES:
+- Output coordinates must be normalized floating points between 0.000 and 1.000.
+- If Is_Off_Screen is Yes, GAZE_XY MUST be written exactly as (OFF, OFF). Do not use numbers or alternative strings.
+- Never guess a generic center-screen default coordinate like (0.5, 0.5) out of uncertainty.
+"""
+    return prompt
+
+
 PROMPT_VARIANTS = {
-    "v_clean_baseline": build_prompt_clean_baseline, 
-    "v_dynamic_cot": build_prompt_dynamic_cot, 
+    "v_clean_baseline": build_prompt_clean_baseline,
+    "v_dynamic_cot": build_prompt_dynamic_cot,
     "v_eye_pose_cot": build_prompt_eye_vs_pose_cot,
-    "v_dynamic_cot_viewer_perspective": build_prompt_dynamic_cot_viewer_perspective,    
+    "v_dynamic_cot_viewer_perspective": build_prompt_dynamic_cot_viewer_perspective,
+    "v5_universal": build_universal_gaze_prompt,
 }
 
-# ── LOOKUP ENGINE ───────────────────────────────────────────────────────
+# ── LOOKUP ENGINE (unchanged from step43d6) ──────────────────────────────
 
 def find_dir_by_clip_id(root_path, clip_id):
     """Exact match on directory name, not substring — avoids matching
@@ -212,17 +305,21 @@ def parse_txt_file_for_frame(filepath, frame_num):
                 continue
     return None
 
+
 def resolve_context(clip, frame_num, subject):
     ann_dir = find_dir_by_clip_id(os.path.join(BASE_PATH, "annotations"), clip)
     img_dir = find_dir_by_clip_id(os.path.join(BASE_PATH, "images"), clip)
-    if not ann_dir or not img_dir: return None
+    if not ann_dir or not img_dir:
+        return None
 
     subj_file = f"{subject}.txt"
     primary_data = parse_txt_file_for_frame(os.path.join(ann_dir, subj_file), frame_num)
-    if not primary_data: return None
+    if not primary_data:
+        return None
 
     img_path = os.path.join(img_dir, primary_data["fname_actual"])
-    if not os.path.exists(img_path): return None
+    if not os.path.exists(img_path):
+        return None
 
     others = []
     for f in os.listdir(ann_dir):
@@ -232,36 +329,43 @@ def resolve_context(clip, frame_num, subject):
                 others.append((f.replace(".txt", ""), sib_data))
     return {"img_path": img_path, "primary": primary_data, "others": others}
 
+
 def parse_gaze_xy(text):
-    if not text or not text.strip(): 
+    if not text or not text.strip():
         return None, None
-        
-    # Catches the traditional flag or the new text-token indicator flags safely
-    if (re.search(r"GAZE_XY:\s*\(-1\s*,\s*-1\)", text, re.IGNORECASE) or 
+
+    if (re.search(r"GAZE_XY:\s*\(-1\s*,\s*-1\)", text, re.IGNORECASE) or
         re.search(r"GAZE_XY:\s*\(\s*OFF\s*,\s*OFF\s*\)", text, re.IGNORECASE) or
-        re.search(r"Is_Off_Screen:\s*Yes", text, re.IGNORECASE)): 
+        re.search(r"Is_Off_Screen:\s*Yes", text, re.IGNORECASE)):
         return -1.0, -1.0
-        
+
     match = re.search(r"GAZE_XY:\s*\(\s*([0-9]*\.?[0-9]+)\s*,\s*([0-9]*\.?[0-9]+)\s*\)", text, re.IGNORECASE)
-    if match: 
+    if match:
         return max(0.0, min(1.0, float(match.group(1)))), max(0.0, min(1.0, float(match.group(2))))
-        
+
     return None, None
 
 
 # ── RUNTIME ENGINE ───────────────────────────────────────────────────────
 
 def main():
+    if not NEW_MULTIPERSON_OBJECT_FRAMES:
+        print("WARNING: NEW_MULTIPERSON_OBJECT_FRAMES is empty — only re-running the")
+        print("original step43d6 frame set. To get evidence on the actual production")
+        print("bottleneck (multi-person object-gaze), populate this list first using")
+        print("labels_full.jsonl (gaze_type=='object', label_source=='teacher') cross-")
+        print("referenced against clip_selected.csv for n_subjects > 1.\n")
+
     print(f"Loading model architecture: {MODEL_NAME}")
     processor = AutoProcessor.from_pretrained(MODEL_NAME)
-    model = AutoModelForImageTextToText.from_pretrained(MODEL_NAME, torch_dtype=torch.float16, device_map="cuda").eval()
+    model = AutoModelForImageTextToText.from_pretrained(MODEL_NAME, dtype=torch.float16, device_map="cuda").eval()
     pad_token_id = getattr(processor.tokenizer, 'pad_token_id', None) or processor.tokenizer.eos_token_id
     print("Model ready.\n")
 
     for clip, frame_num, subject in TARGET_FRAMES:
         print("=" * 80)
         print(f"TARGET: Clip {clip} | Frame {frame_num} | Subject {subject}")
-        
+
         context = resolve_context(clip, frame_num, subject)
         if not context:
             print(f"SKIP — Lookup failure processing frame context.")
@@ -272,7 +376,7 @@ def main():
 
         p = context["primary"]
         primary_box = (int(p["head_x1"]), int(p["head_y1"]), int(p["head_x2"]), int(p["head_y2"]))
-        
+
         all_subjects = [(subject, p)] + context["others"]
         all_subjects.sort(key=lambda x: x[1]["head_x1"])
         ordered_ids = [s[0] for s in all_subjects]
@@ -280,46 +384,55 @@ def main():
 
         def get_spatial_label(subj_id):
             idx = ordered_ids.index(subj_id)
-            if n_total <= 1: return "the only person in frame"
-            if n_total == 2: return ["the person on the left", "the person on the right"][idx]
-            if idx == 0: return "the person on the left"
-            if idx == n_total - 1: return "the person on the right"
+            if n_total <= 1:
+                return "the only person in frame"
+            if n_total == 2:
+                return ["the person on the left", "the person on the right"][idx]
+            if idx == 0:
+                return "the person on the left"
+            if idx == n_total - 1:
+                return "the person on the right"
             return "the person in the centre"
 
         primary_label = get_spatial_label(subject)
-        other_boxes_with_labels = [((int(s[1]["head_x1"]), int(s[1]["head_y1"]), int(s[1]["head_x2"]), int(s[1]["head_y2"])), get_spatial_label(s[0])) for s in all_subjects if s[0] != subject]
+        other_boxes_with_labels = [
+            ((int(s[1]["head_x1"]), int(s[1]["head_y1"]), int(s[1]["head_x2"]), int(s[1]["head_y2"])), get_spatial_label(s[0]))
+            for s in all_subjects if s[0] != subject
+        ]
 
         gt_x = p["gaze_x"] / img_w if p["gaze_x"] != -1 else None
         gt_y = p["gaze_y"] / img_h if p["gaze_y"] != -1 else None
+        is_multiperson = len(other_boxes_with_labels) > 0
         print(f"  Frame File     : {p['fname_actual']}")
-        print(f"  Presence Count : 1 person found" if not other_boxes_with_labels else f"  Presence Count : {len(all_subjects)} people found")
+        print(f"  Presence Count : 1 person found" if not is_multiperson else f"  Presence Count : {len(all_subjects)} people found")
         print(f"  Ground Truth   : ({gt_x:.3f}, {gt_y:.3f})" if gt_x is not None else "  Ground Truth   : off-screen")
 
         for variant_name, build_fn in PROMPT_VARIANTS.items():
             prompt_text = build_fn(img_w, img_h, primary_box, primary_label, other_boxes_with_labels)
             messages = [{"role": "user", "content": [{"type": "image", "image": img_raw}, {"type": "text", "text": prompt_text}]}]
             inputs = processor.apply_chat_template(messages, add_generation_prompt=True, tokenize=True, return_dict=True, return_tensors="pt").to(model.device, dtype=torch.float16)
-            
+
             with torch.inference_mode():
                 output_ids = model.generate(
-                    **inputs, 
-                    max_new_tokens=MAX_NEW_TOKENS, 
+                    **inputs,
+                    max_new_tokens=MAX_NEW_TOKENS,
                     do_sample=False,
                     pad_token_id=pad_token_id
                 )
-            
+
             response = processor.batch_decode(output_ids[:, inputs["input_ids"].shape[1]:], skip_special_tokens=True)[0].strip()
             pred_x, pred_y = parse_gaze_xy(response)
-            
+
             if pred_x == -1.0 and pred_y == -1.0:
                 coord_str = "off-screen (-1, -1)"
             elif pred_x is not None and pred_y is not None:
                 coord_str = f"({pred_x:.3f}, {pred_y:.3f})"
             else:
                 coord_str = "PARSING ERROR"
-                
+
             print(f"\n    [{variant_name}] PRED COORDS : {coord_str}")
-            print(f"    [{variant_name}] MODEL TEXT  : {response.replace('\n', ' | ')}")
+            print(f"    [{variant_name}] MODEL TEXT  : {response.replace(chr(10), ' | ')}")
+
 
 if __name__ == "__main__":
     main()

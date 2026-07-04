@@ -74,33 +74,33 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 # ── CONFIGURATION ─────────────────────────────────────────────────────
 # ══════════════════════════════════════════════════════════════════════
 
-PROMPT_TEST = False # ← START HERE: validate prompt on 10 frames
+PROMPT_TEST = True # ← START HERE: validate prompt on 10 frames
 TEST_MODE   = False  # ← set True for ~50 frame pipeline test
                     # ← set both False for full production run
 
 #BASE_PATH     = r"C:\repo\standard_project\videoattentiontarget"
 #BASE_PATH     = r"/parallel_scratch/sl02092/standard_project/data/videoattentiontarget"
 BASE_PATH = os.environ.get("VAT_BASE_PATH", "/parallel_scratch/sl02092/standard_project/data/videoattentiontarget")
-MANIFEST_PATH = "frame_manifest.csv"
-MODEL_NAME    = "OpenGVLab/InternVL3-8B-hf"
+MANIFEST_PATH   = "frame_manifest.csv"
+MODEL_NAME      = "OpenGVLab/InternVL2_5-26B"
 
 # Locked schema version string — update this if you change the model
 # or prompt so you can identify which labels came from which run.
-TEACHER_VERSION = "internvl3-8b-v4-prompt"
+TEACHER_VERSION = "internvl2.5-26b-v4-prompt"
 
 # Output files (PROMPT_TEST uses its own files, never touches production)
 if PROMPT_TEST:
-    LABELS_FILE   = "labels_prompt_test.jsonl"
-    PROGRESS_FILE = "progress_prompt_test.json"
-    LOG_FILE      = "pipeline_prompt_test.log"
+    LABELS_FILE   = "labels_prompt_test_+"+TEACHER_VERSION+".jsonl"
+    PROGRESS_FILE = "progress_prompt_test_+"+TEACHER_VERSION+".json"
+    LOG_FILE      = "pipeline_prompt_test_+"+TEACHER_VERSION+".log"
 elif TEST_MODE:
-    LABELS_FILE   = "labels_test.jsonl"
-    PROGRESS_FILE = "progress_test.json"
-    LOG_FILE      = "pipeline_test.log"
+    LABELS_FILE   = "labels_test_+"+TEACHER_VERSION+".jsonl"
+    PROGRESS_FILE = "progress_test_+"+TEACHER_VERSION+".json"
+    LOG_FILE      = "pipeline_test_+"+TEACHER_VERSION+".log"
 else:
-    LABELS_FILE   = "labels_full.jsonl"
-    PROGRESS_FILE = "progress_full.json"
-    LOG_FILE      = "pipeline_full.log"
+    LABELS_FILE   = "labels_full_+"+TEACHER_VERSION+".jsonl"
+    PROGRESS_FILE = "progress_full_+"+TEACHER_VERSION+".json"
+    LOG_FILE      = "pipeline_full_+"+TEACHER_VERSION+".log"
 
 # Prompt test settings
 PROMPT_TEST_N = 10
@@ -129,37 +129,51 @@ RETRY_ON_FAIL  = 2
 # ── PROMPT (v3 — unchanged from v3, output-first) ─────────────────────
 # ══════════════════════════════════════════════════════════════════════
 
-def build_social_prompt(img_w, img_h, primary_box, secondary_box):
+def build_universal_gaze_prompt(img_w, img_h, primary_box, primary_label, others_with_labels):
     """
-    GAZE_XY coordinate output comes FIRST — guaranteed within token budget.
-    No confidence token — confidence is now derived from parse success,
-    not model self-report (see schema notes in header).
+    Universal Benchmarking Prompt (v5).
+    Enforces a standardized coordinate space, handles N-body social context,
+    and leverages deductive reasoning tokens to minimize head orientation bias.
     """
+    # 1. Normalize the Target Subject
     ax1, ay1, ax2, ay2 = primary_box
-    bx1, by1, bx2, by2 = secondary_box
+    na = (round(ax1/img_w, 3), round(ay1/img_h, 3), round(ax2/img_w, 3), round(ay2/img_h, 3))
+    
+    prompt = f"TASK: Gaze Tracking and Spatial Grounding. Image Dimensions: {img_w}x{img_h}px.\n"
+    prompt += f"TARGET SUBJECT (Predict gaze for): {primary_label} | Head Box (Normalized): [{na[0]}, {na[1]}, {na[2]}, {na[3]}]\n"
+    
+    # 2. Normalize and Map All Contextual People Natively
+    if others_with_labels:
+        prompt += "OTHER PEOPLE IN FRAME:\n"
+        for b, lbl in others_with_labels:
+            nb_x1 = round(b[0] / img_w, 3)
+            nb_y1 = round(b[1] / img_h, 3)
+            nb_x2 = round(b[2] / img_w, 3)
+            nb_y2 = round(b[3] / img_h, 3)
+            b_cx  = round((nb_x1 + nb_x2) / 2, 3)
+            b_cy  = round((nb_y1 + nb_y2) / 2, 3)
+            prompt += f" - {lbl}: Head Box [{nb_x1}, {nb_y1}, {nb_x2}, {nb_y2}] | Face Centre: ({b_cx}, {b_cy})\n"
+    else:
+        prompt += "OTHER PEOPLE IN FRAME: None. Target subject is alone in the scene.\n"
+    
+    # 3. Structural Directives and Schema Enforcement
+    prompt += """
+ANALYSIS PROTOCOL:
+1. Focus entirely on the target subject's precise eye/pupil direction. Do not rely on macro head orientation if it points away from the eyes.
+2. Formulate a trajectory vector from the eyes. Determine if it cross-references any noted face center or traces completely out of the image boundaries.
+3. If looking at an unlisted object, localize the exact spatial region of that object first.
 
-    b_cx = round((bx1 + bx2) / 2 / img_w, 3)
-    b_cy = round((by1 + by2) / 2 / img_h, 3)
-
-    na = (round(ax1/img_w,3), round(ay1/img_h,3),
-          round(ax2/img_w,3), round(ay2/img_h,3))
-
-    return f"""Gaze estimation task. Image: {img_w}x{img_h}px.
-
-PERSON A (predict gaze): head box (normalised) ({na[0]},{na[1]}) to ({na[2]},{na[3]})
-PERSON B (other person): head box px ({bx1},{by1}) to ({bx2},{by2}), face centre ({b_cx},{b_cy})
-
-YOUR FIRST LINE MUST BE:
+REQUIRED RESPONSE SCHEMA:
+Reasoning: [1-2 sentences of step-by-step spatial tracking analysis]
+Is_Off_Screen: [Yes or No]
 GAZE_XY: (x, y)
 
-Rules:
-- If A looks at B's face → use B's face centre: ({b_cx},{b_cy})
-- If A looks at an object → estimate object location in normalised coords
-- If A looks off-screen → use (-1,-1)
-- x,y are normalised 0.0-1.0 (0,0=top-left, 1,1=bottom-right)
-
-After the coordinate, add one sentence explaining why."""
-
+CRITICAL COMPLIANCE RULES:
+- Output coordinates must be normalized floating points between 0.000 and 1.000.
+- If Is_Off_Screen is Yes, GAZE_XY MUST be written exactly as (OFF, OFF). Do not use numbers or alternative strings.
+- Never guess a generic center-screen default coordinate like (0.5, 0.5) out of uncertainty.
+"""
+    return prompt
 
 def parse_gaze_xy(text):
     """
@@ -344,12 +358,12 @@ def run_teacher(model, processor, img_raw, primary_box, secondary_box,
     }]
 
     inputs = processor.apply_chat_template(
-        messages,
-        add_generation_prompt=True,
-        tokenize=True,
-        return_dict=True,
-        return_tensors="pt",
-    ).to(model.device, dtype=torch.float16)
+            messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(model.device, dtype=torch.bfloat16)  # Change from float16/float32 to bfloat16
 
     with torch.inference_mode():
         output_ids = model.generate(
@@ -521,11 +535,12 @@ def main():
     log(f"\nLoading model: {MODEL_NAME}")
     processor = AutoProcessor.from_pretrained(MODEL_NAME)
 
-    model     = AutoModelForImageTextToText.from_pretrained(
+    model = AutoModelForImageTextToText.from_pretrained(
         MODEL_NAME,
-        dtype=torch.float16,
-        device_map="cuda",
+        torch_dtype=torch.bfloat16,    # Add this line to force 16-bit brain precision
         low_cpu_mem_usage=True,
+        trust_remote_code=True,
+        device_map="auto"              # Essential for splitting the 26B parameters across cards
     ).eval()
     log(f"Model loaded  VRAM: {torch.cuda.memory_allocated()/1e9:.1f} GB")
 

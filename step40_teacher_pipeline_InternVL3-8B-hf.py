@@ -129,37 +129,51 @@ RETRY_ON_FAIL  = 2
 # ── PROMPT (v3 — unchanged from v3, output-first) ─────────────────────
 # ══════════════════════════════════════════════════════════════════════
 
-def build_social_prompt(img_w, img_h, primary_box, secondary_box):
+def build_universal_gaze_prompt(img_w, img_h, primary_box, primary_label, others_with_labels):
     """
-    GAZE_XY coordinate output comes FIRST — guaranteed within token budget.
-    No confidence token — confidence is now derived from parse success,
-    not model self-report (see schema notes in header).
+    Universal Benchmarking Prompt (v5).
+    Enforces a standardized coordinate space, handles N-body social context,
+    and leverages deductive reasoning tokens to minimize head orientation bias.
     """
+    # 1. Normalize the Target Subject
     ax1, ay1, ax2, ay2 = primary_box
-    bx1, by1, bx2, by2 = secondary_box
+    na = (round(ax1/img_w, 3), round(ay1/img_h, 3), round(ax2/img_w, 3), round(ay2/img_h, 3))
+    
+    prompt = f"TASK: Gaze Tracking and Spatial Grounding. Image Dimensions: {img_w}x{img_h}px.\n"
+    prompt += f"TARGET SUBJECT (Predict gaze for): {primary_label} | Head Box (Normalized): [{na[0]}, {na[1]}, {na[2]}, {na[3]}]\n"
+    
+    # 2. Normalize and Map All Contextual People Natively
+    if others_with_labels:
+        prompt += "OTHER PEOPLE IN FRAME:\n"
+        for b, lbl in others_with_labels:
+            nb_x1 = round(b[0] / img_w, 3)
+            nb_y1 = round(b[1] / img_h, 3)
+            nb_x2 = round(b[2] / img_w, 3)
+            nb_y2 = round(b[3] / img_h, 3)
+            b_cx  = round((nb_x1 + nb_x2) / 2, 3)
+            b_cy  = round((nb_y1 + nb_y2) / 2, 3)
+            prompt += f" - {lbl}: Head Box [{nb_x1}, {nb_y1}, {nb_x2}, {nb_y2}] | Face Centre: ({b_cx}, {b_cy})\n"
+    else:
+        prompt += "OTHER PEOPLE IN FRAME: None. Target subject is alone in the scene.\n"
+    
+    # 3. Structural Directives and Schema Enforcement
+    prompt += """
+ANALYSIS PROTOCOL:
+1. Focus entirely on the target subject's precise eye/pupil direction. Do not rely on macro head orientation if it points away from the eyes.
+2. Formulate a trajectory vector from the eyes. Determine if it cross-references any noted face center or traces completely out of the image boundaries.
+3. If looking at an unlisted object, localize the exact spatial region of that object first.
 
-    b_cx = round((bx1 + bx2) / 2 / img_w, 3)
-    b_cy = round((by1 + by2) / 2 / img_h, 3)
-
-    na = (round(ax1/img_w,3), round(ay1/img_h,3),
-          round(ax2/img_w,3), round(ay2/img_h,3))
-
-    return f"""Gaze estimation task. Image: {img_w}x{img_h}px.
-
-PERSON A (predict gaze): head box (normalised) ({na[0]},{na[1]}) to ({na[2]},{na[3]})
-PERSON B (other person): head box px ({bx1},{by1}) to ({bx2},{by2}), face centre ({b_cx},{b_cy})
-
-YOUR FIRST LINE MUST BE:
+REQUIRED RESPONSE SCHEMA:
+Reasoning: [1-2 sentences of step-by-step spatial tracking analysis]
+Is_Off_Screen: [Yes or No]
 GAZE_XY: (x, y)
 
-Rules:
-- If A looks at B's face → use B's face centre: ({b_cx},{b_cy})
-- If A looks at an object → estimate object location in normalised coords
-- If A looks off-screen → use (-1,-1)
-- x,y are normalised 0.0-1.0 (0,0=top-left, 1,1=bottom-right)
-
-After the coordinate, add one sentence explaining why."""
-
+CRITICAL COMPLIANCE RULES:
+- Output coordinates must be normalized floating points between 0.000 and 1.000.
+- If Is_Off_Screen is Yes, GAZE_XY MUST be written exactly as (OFF, OFF). Do not use numbers or alternative strings.
+- Never guess a generic center-screen default coordinate like (0.5, 0.5) out of uncertainty.
+"""
+    return prompt
 
 def parse_gaze_xy(text):
     """
