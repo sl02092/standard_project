@@ -1,0 +1,48 @@
+============================================================
+Step 5b — Distillation Value Experiment
+Teacher Labels vs GT Labels — which trains better?
+============================================================
+  Device : cuda
+  Labels : /parallel_scratch/sl02092/standard_project/InternV3_GDino_Hybrid_Attempt_002/labels_hybrid_targeted.jsonl
+  Model  : vit_tiny_patch16_224
+
+  Loaded 18298 valid on-screen records (skipped 4798 off-screen, 0 missing-field rows)
+  Label sources : {'teacher': 12899, 'teacher_hybrid': 5029, 'gt_fallback': 370}
+  Gaze types    : {'social': 12899, 'object': 5399}
+
+  Train : 14102 records
+  Val   : 4196 records
+
+  Initialising model architecture...
+    Parameters: 5.7M
+
+  Label noise (teacher vs GT distance):
+    Mean : 0.1975
+    Max  : 0.9515
+    Min  : 0.0000
+    Within 0.10 (px ~144): 8788/18298 (48%)
+
+  Training on TEACHER labels...
+    Parameters: 5.7M
+    [teacher] Epoch 01  loss=0.0182  val_ADE=0.2535  val_ADE_px=247.6px <- best
+    [teacher] Epoch 02  loss=0.0161  val_ADE=0.2388  val_ADE_px=238.1px <- best
+    [teacher] Epoch 03  loss=0.0138  val_ADE=0.2366  val_ADE_px=236.7px <- best
+    [teacher] Epoch 04  loss=0.0120  val_ADE=0.2401  val_ADE_px=245.3px (no improve 1/6)
+    [teacher] Epoch 05  loss=0.0104  val_ADE=0.2468  val_ADE_px=251.7px (no improve 2/6)
+    [teacher] Epoch 06  loss=0.0092  val_ADE=0.2443  val_ADE_px=249.2px (no improve 3/6)
+    [teacher] Epoch 07  loss=0.0082  val_ADE=0.2326  val_ADE_px=233.4px <- best
+    [teacher] Epoch 08  loss=0.0072  val_ADE=0.2466  val_ADE_px=245.6px (no improve 1/6)
+    [teacher] Epoch 09  loss=0.0061  val_ADE=0.2411  val_ADE_px=245.3px (no improve 2/6)
+    [teacher] Epoch 10  loss=0.0054  val_ADE=0.2219  val_ADE_px=224.4px <- best
+    [teacher] Epoch 11  loss=0.0046  val_ADE=0.2367  val_ADE_px=240.6px (no improve 1/6)
+    [teacher] Epoch 12  loss=0.0040  val_ADE=0.2329  val_ADE_px=234.9px (no improve 2/6)
+    [teacher] Epoch 13  loss=0.0035  val_ADE=0.2349  val_ADE_px=240.4px (no improve 3/6)
+    [teacher] Epoch 14  loss=0.0032  val_ADE=0.2389  val_ADE_px=243.1px (no improve 4/6)
+    [teacher] Epoch 15  loss=0.0030  val_ADE=0.2381  val_ADE_px=242.9px (no improve 5/6)
+
+  Training on GT labels...
+    Parameters: 5.7M
+    [gt     ] Epoch 01  loss=0.0192  val_ADE=0.2325  val_ADE_px=235.5px <- best
+    [gt     ] Epoch 02  loss=0.0185  val_ADE=0.2408  val_ADE_px=239.5px (no improve 1/6)
+    [gt     ] Epoch 03  loss=0.0175  val_ADE=0.2316  val_ADE_px=234.9px <- best
+    [gt     ] Epoch 04  loss=0.0165  val_ADE=0.2337  val_ADE_px=236.3px (no improve 1/6)

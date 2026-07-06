@@ -1,0 +1,109 @@
+[*] Resolving Dataset Pipelines...
+[+] Detected Eureka2 Cluster Environment Manifest Layout.
+[+] Successfully loaded manifest layout (23096 total available pairs).
+[+] Footprint configuration bound: Selected 5000 training instances.
+[*] Initializing Foundation Weights & Tokenizers...
+[+] Projector weights initialized safely using bounded distributions.
+
+[+] System Grounded. Beginning Projector Alignment over 1250 micro-batches...
+  Epoch [1/3] | Step [50/1250] -> Current Running Loss: 3.2812
+  Epoch [1/3] | Step [100/1250] -> Current Running Loss: 1.4922
+  Epoch [1/3] | Step [150/1250] -> Current Running Loss: 1.4141
+  Epoch [1/3] | Step [200/1250] -> Current Running Loss: 1.3672
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step200.pt
+  Epoch [1/3] | Step [250/1250] -> Current Running Loss: 1.0625
+  Epoch [1/3] | Step [300/1250] -> Current Running Loss: 0.7812
+  Epoch [1/3] | Step [350/1250] -> Current Running Loss: 0.7734
+  Epoch [1/3] | Step [400/1250] -> Current Running Loss: 1.0547
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step400.pt
+  Epoch [1/3] | Step [450/1250] -> Current Running Loss: 1.0781
+  Epoch [1/3] | Step [500/1250] -> Current Running Loss: 1.3359
+  Epoch [1/3] | Step [550/1250] -> Current Running Loss: 1.1953
+  Epoch [1/3] | Step [600/1250] -> Current Running Loss: 1.1094
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step600.pt
+  Epoch [1/3] | Step [650/1250] -> Current Running Loss: 0.9492
+  Epoch [1/3] | Step [700/1250] -> Current Running Loss: 1.1562
+  Epoch [1/3] | Step [750/1250] -> Current Running Loss: 0.9375
+  Epoch [1/3] | Step [800/1250] -> Current Running Loss: 1.1172
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step800.pt
+  Epoch [1/3] | Step [850/1250] -> Current Running Loss: 1.1406
+  Epoch [1/3] | Step [900/1250] -> Current Running Loss: 1.0469
+  Epoch [1/3] | Step [950/1250] -> Current Running Loss: 0.6797
+  Epoch [1/3] | Step [1000/1250] -> Current Running Loss: 1.0547
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step1000.pt
+  Epoch [1/3] | Step [1050/1250] -> Current Running Loss: 1.1328
+  Epoch [1/3] | Step [1100/1250] -> Current Running Loss: 1.0859
+  Epoch [1/3] | Step [1150/1250] -> Current Running Loss: 1.0703
+  Epoch [1/3] | Step [1200/1250] -> Current Running Loss: 0.7891
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_step1200.pt
+  Epoch [1/3] | Step [1250/1250] -> Current Running Loss: 1.1562
+[*] Epoch [1/3] Completed -> Average Realignment Loss: 1.2404
+  [ckpt] Saved end-of-epoch checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch1_final.pt
+  Epoch [2/3] | Step [50/1250] -> Current Running Loss: 0.9297
+  Epoch [2/3] | Step [100/1250] -> Current Running Loss: 1.1406
+  Epoch [2/3] | Step [150/1250] -> Current Running Loss: 0.8828
+  Epoch [2/3] | Step [200/1250] -> Current Running Loss: 0.8203
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step200.pt
+  Epoch [2/3] | Step [250/1250] -> Current Running Loss: 0.8906
+  Epoch [2/3] | Step [300/1250] -> Current Running Loss: 1.2656
+  Epoch [2/3] | Step [350/1250] -> Current Running Loss: 0.6445
+  Epoch [2/3] | Step [400/1250] -> Current Running Loss: 1.0625
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step400.pt
+  Epoch [2/3] | Step [450/1250] -> Current Running Loss: 1.0859
+  Epoch [2/3] | Step [500/1250] -> Current Running Loss: 0.6250
+  Epoch [2/3] | Step [550/1250] -> Current Running Loss: 0.9531
+  Epoch [2/3] | Step [600/1250] -> Current Running Loss: 1.0312
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step600.pt
+  Epoch [2/3] | Step [650/1250] -> Current Running Loss: 0.8828
+  Epoch [2/3] | Step [700/1250] -> Current Running Loss: 0.5391
+  Epoch [2/3] | Step [750/1250] -> Current Running Loss: 1.0312
+  Epoch [2/3] | Step [800/1250] -> Current Running Loss: 1.0625
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step800.pt
+  Epoch [2/3] | Step [850/1250] -> Current Running Loss: 1.0469
+  Epoch [2/3] | Step [900/1250] -> Current Running Loss: 0.7695
+  Epoch [2/3] | Step [950/1250] -> Current Running Loss: 0.8516
+  Epoch [2/3] | Step [1000/1250] -> Current Running Loss: 1.0391
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step1000.pt
+  Epoch [2/3] | Step [1050/1250] -> Current Running Loss: 1.1172
+  Epoch [2/3] | Step [1100/1250] -> Current Running Loss: 0.8125
+  Epoch [2/3] | Step [1150/1250] -> Current Running Loss: 0.9844
+  Epoch [2/3] | Step [1200/1250] -> Current Running Loss: 0.9492
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_step1200.pt
+  Epoch [2/3] | Step [1250/1250] -> Current Running Loss: 0.7812
+[*] Epoch [2/3] Completed -> Average Realignment Loss: 0.8835
+  [ckpt] Saved end-of-epoch checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch2_final.pt
+  Epoch [3/3] | Step [50/1250] -> Current Running Loss: 0.7969
+  Epoch [3/3] | Step [100/1250] -> Current Running Loss: 1.0078
+  Epoch [3/3] | Step [150/1250] -> Current Running Loss: 0.7617
+  Epoch [3/3] | Step [200/1250] -> Current Running Loss: 0.8984
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step200.pt
+  Epoch [3/3] | Step [250/1250] -> Current Running Loss: 0.5664
+  Epoch [3/3] | Step [300/1250] -> Current Running Loss: 0.8281
+  Epoch [3/3] | Step [350/1250] -> Current Running Loss: 0.9453
+  Epoch [3/3] | Step [400/1250] -> Current Running Loss: 1.0156
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step400.pt
+  Epoch [3/3] | Step [450/1250] -> Current Running Loss: 0.6133
+  Epoch [3/3] | Step [500/1250] -> Current Running Loss: 0.8203
+  Epoch [3/3] | Step [550/1250] -> Current Running Loss: 0.7852
+  Epoch [3/3] | Step [600/1250] -> Current Running Loss: 1.0312
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step600.pt
+  Epoch [3/3] | Step [650/1250] -> Current Running Loss: 0.7812
+  Epoch [3/3] | Step [700/1250] -> Current Running Loss: 1.0781
+  Epoch [3/3] | Step [750/1250] -> Current Running Loss: 0.6523
+  Epoch [3/3] | Step [800/1250] -> Current Running Loss: 0.5469
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step800.pt
+  Epoch [3/3] | Step [850/1250] -> Current Running Loss: 0.9531
+  Epoch [3/3] | Step [900/1250] -> Current Running Loss: 0.7812
+  Epoch [3/3] | Step [950/1250] -> Current Running Loss: 1.0703
+  Epoch [3/3] | Step [1000/1250] -> Current Running Loss: 1.0234
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step1000.pt
+  Epoch [3/3] | Step [1050/1250] -> Current Running Loss: 0.6094
+  Epoch [3/3] | Step [1100/1250] -> Current Running Loss: 1.0391
+  Epoch [3/3] | Step [1150/1250] -> Current Running Loss: 1.0312
+  Epoch [3/3] | Step [1200/1250] -> Current Running Loss: 1.0547
+  [ckpt] Saved intermediate checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_step1200.pt
+  Epoch [3/3] | Step [1250/1250] -> Current Running Loss: 0.5781
+[*] Epoch [3/3] Completed -> Average Realignment Loss: 0.8583
+  [ckpt] Saved end-of-epoch checkpoint -> /parallel_scratch/sl02092/standard_project/dino_internvl_projector_ckpt_epoch3_final.pt
+
+[+] Realignment complete. Model weight matrix exported to: /parallel_scratch/sl02092/standard_project/dino_internvl_projector.pt

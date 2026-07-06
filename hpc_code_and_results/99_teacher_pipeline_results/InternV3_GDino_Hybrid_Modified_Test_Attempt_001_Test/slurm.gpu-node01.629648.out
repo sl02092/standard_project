@@ -1,0 +1,41 @@
+[2026-07-04 20:01:48] Hybrid teacher pipeline starting [TEST_MODE]
+[2026-07-04 20:01:48]   InternVL3: OpenGVLab/InternVL3-8B-hf
+[2026-07-04 20:01:48]   Grounding DINO: IDEA-Research/grounding-dino-base
+[2026-07-04 20:01:48]   Output: labels_hybrid_targeted_lat_test.jsonl
+[2026-07-04 20:01:48] Manifest loaded: 23096 frame-subject pairs
+[2026-07-04 20:01:48] TEST MODE: 85 frame-subject pairs
+[2026-07-04 20:01:48] Remaining: 85 pairs
+[2026-07-04 20:01:48] GT direct: 0
+[2026-07-04 20:01:48] Social (InternVL3-alone): 78
+[2026-07-04 20:01:48] Object (Hybrid InternVL3+GDINO): 7
+[2026-07-04 20:01:48] Loading InternVL3-8B-hf...
+[2026-07-04 20:04:10] InternVL3 loaded.
+[2026-07-04 20:04:10] Loading Grounding DINO...
+[2026-07-04 20:04:22] Grounding DINO loaded.
+[2026-07-04 20:04:22] Writing 0 GT-direct labels...
+[2026-07-04 20:04:22] GT labels written: 0
+[2026-07-04 20:04:22] Starting social-frame inference on 78 frames...
+  Social [10/78] 2.2s/frame ETA:0.0hrs OK:10 Fail:0
+  Social [20/78] 1.9s/frame ETA:0.0hrs OK:20 Fail:0
+  Social [30/78] 1.8s/frame ETA:0.0hrs OK:30 Fail:0
+  Social [40/78] 1.7s/frame ETA:0.0hrs OK:40 Fail:0
+  Social [50/78] 1.7s/frame ETA:0.0hrs OK:50 Fail:0
+  Social [60/78] 1.8s/frame ETA:0.0hrs OK:60 Fail:0
+  Social [70/78] 1.7s/frame ETA:0.0hrs OK:70 Fail:0
+[2026-07-04 20:06:39] Social complete: 78 ok, 0 fallback
+[2026-07-04 20:06:39] Starting hybrid inference on 7 object-gaze frames...
+[2026-07-04 20:06:58] 
+============================================================
+[2026-07-04 20:06:58] Pipeline complete [TEST_MODE]
+[2026-07-04 20:06:59] ============================================================
+[2026-07-04 20:06:59]   GT direct labels:            0
+[2026-07-04 20:06:59]   Social (InternVL3-alone):    78 ok, 0 fallback
+[2026-07-04 20:06:59]   Object hybrid (success):     7
+[2026-07-04 20:06:59]   Object hybrid (fallback GT): 0
+[2026-07-04 20:06:59]     of which InternVL3 said off-screen: 0
+[2026-07-04 20:06:59]     of which GDINO found no box:        0
+[2026-07-04 20:06:59]   Laterality qualifier present in phrase: 6
+[2026-07-04 20:06:59]   Laterality selection actually fired:    6 (qualifier present AND >1 GDINO box returned)
+[2026-07-04 20:06:59]   Labels file: labels_hybrid_targeted_lat_test.jsonl
+[2026-07-04 20:06:59]   Elapsed: 0.01 hrs
+[2026-07-04 20:06:59]   Object-frame hybrid parse rate: 100.0%

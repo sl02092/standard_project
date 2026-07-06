@@ -1,0 +1,21 @@
+Frame / Subject              | Object Phrase                    | Dist     | vs box-centroid  | vs face-refined
+--------------------------------------------------------------------------------------------------------------
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+17742_17893/17826 (s00)      | man's face                       | 0.263    | -0.004           | +0.190
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+10239_10740/10270 (s01)      | woman on the left                | 0.570    | +0.000           | -0.035
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+14250_14430/14250 (s01)      | newspaper                        | 0.023    | -0.000           | +0.122
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+19636_19829/19658 (s00)      | woman in the white dress         | 0.040    | +0.000           | +0.186
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+1710_1890/1737 (s02)         | hand of the man in the blue jack | 0.064    | +0.217           | +0.071
+[transformers] Setting `pad_token_id` to `eos_token_id`:151645 for open-end generation.
+1348_1469/1382 (s00)         | hand of the man on the right     | 0.204    | +0.127           | +0.261
+--------------------------------------------------------------------------------------------------------------
+
+Mean ADE, targeted-phrase (n=6): 0.1940
+  vs box-centroid  (0.2507): +0.0566
+  vs face-refined  (0.3265): +0.1325
+
+(positive = targeted-phrase improved on that method; note 'woman in white dress' / clip 1710_1890 is expected to still fail -- wrong-entity identification, not agranularity issue -- see docstring)

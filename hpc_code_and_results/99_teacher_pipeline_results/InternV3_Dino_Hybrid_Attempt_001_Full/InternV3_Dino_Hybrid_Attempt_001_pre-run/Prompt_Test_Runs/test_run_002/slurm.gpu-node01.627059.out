@@ -1,0 +1,39 @@
+[2026-07-02 12:37:16] Hybrid teacher pipeline starting [TEST_MODE]
+[2026-07-02 12:37:16]   InternVL3: OpenGVLab/InternVL3-8B-hf
+[2026-07-02 12:37:16]   Grounding DINO: IDEA-Research/grounding-dino-base
+[2026-07-02 12:37:16]   Output: labels_hybrid_test.jsonl
+[2026-07-02 12:37:16] Manifest loaded: 23096 frame-subject pairs
+[2026-07-02 12:37:16] TEST MODE: 85 frame-subject pairs
+[2026-07-02 12:37:16] Remaining: 85 pairs
+[2026-07-02 12:37:16] GT direct: 0
+[2026-07-02 12:37:16] Social (InternVL3-alone): 78
+[2026-07-02 12:37:16] Object (Hybrid InternVL3+GDINO): 7
+[2026-07-02 12:37:16] Loading InternVL3-8B-hf...
+[2026-07-02 12:37:23] InternVL3 loaded.
+[2026-07-02 12:37:23] Loading Grounding DINO...
+[2026-07-02 12:37:26] Grounding DINO loaded.
+[2026-07-02 12:37:26] Writing 0 GT-direct labels...
+[2026-07-02 12:37:26] GT labels written: 0
+[2026-07-02 12:37:26] Starting social-frame inference on 78 frames...
+  Social [10/78] 1.9s/frame ETA:0.0hrs OK:10 Fail:0
+  Social [20/78] 1.7s/frame ETA:0.0hrs OK:20 Fail:0
+  Social [30/78] 1.7s/frame ETA:0.0hrs OK:30 Fail:0
+  Social [40/78] 1.6s/frame ETA:0.0hrs OK:40 Fail:0
+  Social [50/78] 1.6s/frame ETA:0.0hrs OK:50 Fail:0
+  Social [60/78] 1.7s/frame ETA:0.0hrs OK:60 Fail:0
+  Social [70/78] 1.7s/frame ETA:0.0hrs OK:70 Fail:0
+[2026-07-02 12:39:35] Social complete: 78 ok, 0 fallback
+[2026-07-02 12:39:35] Starting hybrid inference on 7 object-gaze frames...
+[2026-07-02 12:39:47] 
+============================================================
+[2026-07-02 12:39:47] Pipeline complete [TEST_MODE]
+[2026-07-02 12:39:47] ============================================================
+[2026-07-02 12:39:47]   GT direct labels:            0
+[2026-07-02 12:39:47]   Social (InternVL3-alone):    78 ok, 0 fallback
+[2026-07-02 12:39:47]   Object hybrid (success):     7
+[2026-07-02 12:39:47]   Object hybrid (fallback GT): 0
+[2026-07-02 12:39:47]     of which InternVL3 said off-screen: 0
+[2026-07-02 12:39:47]     of which GDINO found no box:        0
+[2026-07-02 12:39:47]   Labels file: labels_hybrid_test.jsonl
+[2026-07-02 12:39:47]   Elapsed: 0.00 hrs
+[2026-07-02 12:39:47]   Object-frame hybrid parse rate: 100.0%
