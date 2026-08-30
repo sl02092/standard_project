@@ -1,0 +1,16 @@
+{
+  "dataset": "childplay",
+  "model_name": "gazelle_dinov2_vitb14",
+  "n_records": 20100,
+  "pooled_ade": 0.11528446087346352,
+  "by_gaze_type": {
+    "object": {
+      "ade": 0.11864201410989533,
+      "n": 14864
+    },
+    "social": {
+      "ade": 0.10575301104414293,
+      "n": 5236
+    }
+  }
+}

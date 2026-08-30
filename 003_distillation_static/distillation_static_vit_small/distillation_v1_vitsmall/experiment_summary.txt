@@ -1,0 +1,11 @@
+DISTILLATION RUN — ['vat', 'childplay', 'vacation'] — confidence_threshold=0.55
+======================================================================
+
+  gt                       best_epoch=4    ADE=0.1832  n_train=361045 n_val=43215  wall_clock=42425s
+      in/out: precision=0.370 recall=0.151 f1=0.215 roc_auc=0.8807373889916981
+  teacher_hybrid           best_epoch=3    ADE=0.2105  n_train=361045 n_val=43215  wall_clock=38609s
+      in/out: precision=0.594 recall=0.238 f1=0.340 roc_auc=0.867167695577141
+  teacher_internvl3_alone  best_epoch=5    ADE=0.1766  n_train=361045 n_val=43215  wall_clock=46346s
+      in/out: precision=0.224 recall=0.059 f1=0.094 roc_auc=0.7739361527106619
+  mtgs                     best_epoch=8    ADE=0.1668  n_train=361045 n_val=43215  wall_clock=57881s
+      in/out: precision=0.601 recall=0.105 f1=0.179 roc_auc=0.833023396981686

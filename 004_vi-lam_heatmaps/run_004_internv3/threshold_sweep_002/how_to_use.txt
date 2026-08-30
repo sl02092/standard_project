@@ -1,0 +1,51 @@
+Yes — literally ran the exact `threshold_sweep_inout.py` file I gave you earlier, via my own sandbox, directly against the two raw probability JSONs you uploaded. Same code, real data, not a re-derivation or approximation.
+
+## How to run it yourself
+
+Genuinely simple — this is the one script in this whole project that needs **no GPU, no apptainer, no venv at all**. It only uses Python's built-in `json` module, so any plain `python3` works — HPC, your laptop, anywhere.
+
+```bash
+export INOUT_RAW_PROBS_PATH="/path/to/inout_raw_probs_gt.json"
+python3 threshold_sweep_inout.py
+```
+
+That's the whole thing. Just needs `threshold_sweep_inout.py` sitting in the same folder you run it from, and the env var pointed at whichever raw-probabilities file you want to sweep.
+
+**Output**: prints the full precision/recall/F1 table across 19 thresholds straight to the console, then saves a `inout_threshold_sweep_{condition}.json` file alongside the input (same folder, name auto-derived by swapping `inout_raw_probs_` for `inout_threshold_sweep_` in the filename) — so it's there for reference later without needing to rerun.
+
+**If you ever train another condition** (say you did end up running `mtgs` or `teacher_internvl3_alone` through Vi-LAD later) — as long as `eval_static_v1.py` produces a new `inout_raw_probs_{that_condition}.json`, this exact same command works on it unchanged, just point `INOUT_RAW_PROBS_PATH` at the new file. No code changes needed for a new condition, ever — that's the whole point of separating the expensive part (running the model) from the cheap part (trying thresholds).
+
+
+---
+===
+---
+
+note: This worked for me:
+
+gt:
+#$env:INOUT_RAW_PROBS_PATH="C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_002_threshold_sweep_used_for_eval_local\inout_raw_probs_gt_small.json"
+
+
+
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_gt_small.json"
+python threshold_sweep_inout.py
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_gt_tiny.json"
+python threshold_sweep_inout.py
+
+internv3:
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_teacher_internvl3_alone_small.json"
+python threshold_sweep_inout.py
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_teacher_internvl3_alone_tiny.json"
+python threshold_sweep_inout.py
+
+hybrid:
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_teacher_hybrid_small.json"
+python threshold_sweep_inout.py
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_teacher_hybrid_tiny.json"
+python threshold_sweep_inout.py
+
+mtgs:
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_mtgs_small.json"
+python threshold_sweep_inout.py
+$env:INOUT_RAW_PROBS_PATH="inout_raw_probs_mtgs_tiny.json"
+python threshold_sweep_inout.py

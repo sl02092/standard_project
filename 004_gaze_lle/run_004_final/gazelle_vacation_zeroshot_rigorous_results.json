@@ -1,0 +1,16 @@
+{
+  "dataset": "vacation",
+  "model_name": "gazelle_dinov2_vitb14",
+  "n_records": 11928,
+  "pooled_ade": 0.12446647839892185,
+  "by_gaze_type": {
+    "social": {
+      "ade": 0.11550663442848945,
+      "n": 6787
+    },
+    "object": {
+      "ade": 0.13629500612257964,
+      "n": 5141
+    }
+  }
+}

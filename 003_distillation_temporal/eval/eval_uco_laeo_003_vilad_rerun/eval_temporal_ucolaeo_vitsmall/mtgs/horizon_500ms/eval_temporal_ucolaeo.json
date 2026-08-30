@@ -1,0 +1,47 @@
+{
+  "run_metadata": {
+    "static_condition": "mtgs",
+    "target_horizon_ms": 500,
+    "architectures": [
+      "GRU",
+      "Transformer",
+      "ResidualGRU",
+      "ResidualTransformer"
+    ],
+    "n_rows": 2742
+  },
+  "results": {
+    "GRU": {
+      "pooled_ade": 0.15961809024448426,
+      "pooled_baseline_ade": 0.15564404966851755,
+      "n": 2742,
+      "by_gaze_type": {
+        "social": 0.15961809024448426
+      }
+    },
+    "Transformer": {
+      "pooled_ade": 0.15903178439898036,
+      "pooled_baseline_ade": 0.15564404966851755,
+      "n": 2742,
+      "by_gaze_type": {
+        "social": 0.15903178439898036
+      }
+    },
+    "ResidualGRU": {
+      "pooled_ade": 0.15999500944844994,
+      "pooled_baseline_ade": 0.15564404966851755,
+      "n": 2742,
+      "by_gaze_type": {
+        "social": 0.15999500944844994
+      }
+    },
+    "ResidualTransformer": {
+      "pooled_ade": 0.1596769908827578,
+      "pooled_baseline_ade": 0.15564404966851755,
+      "n": 2742,
+      "by_gaze_type": {
+        "social": 0.1596769908827578
+      }
+    }
+  }
+}

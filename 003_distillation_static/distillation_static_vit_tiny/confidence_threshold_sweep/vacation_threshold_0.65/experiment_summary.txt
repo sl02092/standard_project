@@ -1,0 +1,5 @@
+DISTILLATION RUN — ['vacation'] — confidence_threshold=0.65
+======================================================================
+
+  teacher_hybrid           best_epoch=9    ADE=0.2103  n_train=105753 n_val=21817  wall_clock=6288s
+      in/out: precision=0.000 recall=0.000 f1=0.000 roc_auc=None

@@ -1,0 +1,43 @@
+{
+  "run_metadata": {
+    "static_condition": "teacher_internvl3_alone",
+    "target_horizon_ms": 100,
+    "architectures": [
+      "GRU",
+      "Transformer",
+      "ResidualGRU",
+      "ResidualTransformer"
+    ],
+    "n_rows": 3430
+  },
+  "results": {
+    "GRU": {
+      "pooled_ade": 0.22522205234615203,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.22522205234615203
+      }
+    },
+    "Transformer": {
+      "pooled_ade": 0.21956712644243118,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.21956712644243118
+      }
+    },
+    "ResidualGRU": {
+      "pooled_ade": 0.21975962318203063,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.21975962318203063
+      }
+    },
+    "ResidualTransformer": {
+      "pooled_ade": 0.2204005252685311,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.2204005252685311
+      }
+    }
+  }
+}

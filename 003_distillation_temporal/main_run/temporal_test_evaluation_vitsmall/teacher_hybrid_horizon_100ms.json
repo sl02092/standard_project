@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "teacher_hybrid",
+    "target_horizon_ms": 100,
+    "n_test": 12441,
+    "n_matched": 12335,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vitsmall/teacher_hybrid/horizon_100ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vitsmall",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.2325930849353749,
+      "matched_ade": 0.23188312924064033
+    },
+    "GRU": {
+      "full_ade": 0.22692628174010518,
+      "matched_ade": 0.22611313058440144,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0057699986562388785,
+        "ci_lo": 0.00444789266883033,
+        "ci_hi": 0.00706629041920998,
+        "verdict": "REAL+"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.22300115673917778,
+      "matched_ade": 0.22219406502129962,
+      "significance_vs_baseline": {
+        "mean_diff": 0.00968906421934069,
+        "ci_lo": 0.008330530329082639,
+        "ci_hi": 0.011024348520704295,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.2253746768266747,
+      "matched_ade": 0.2245255179164809,
+      "significance_vs_baseline": {
+        "mean_diff": 0.007357611324159443,
+        "ci_lo": 0.0060588147470420455,
+        "ci_hi": 0.008618978360931092,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.22720730117003107,
+      "matched_ade": 0.22640685910594216,
+      "significance_vs_baseline": {
+        "mean_diff": 0.005476270134698178,
+        "ci_lo": 0.0042717763126641755,
+        "ci_hi": 0.006657913514935511,
+        "verdict": "REAL+"
+      }
+    }
+  }
+}

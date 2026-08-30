@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "gt",
+    "target_horizon_ms": 500,
+    "n_test": 10763,
+    "n_matched": 10389,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vitsmall/gt/horizon_500ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vitsmall",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.2032238141497545,
+      "matched_ade": 0.19981290977947547
+    },
+    "GRU": {
+      "full_ade": 0.2035699348889138,
+      "matched_ade": 0.20053138538366136,
+      "significance_vs_baseline": {
+        "mean_diff": -0.000718475604185872,
+        "ci_lo": -0.0013460471917556558,
+        "ci_hi": -6.575496910306308e-05,
+        "verdict": "REAL-"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.20381877353126487,
+      "matched_ade": 0.20086023739105385,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0010473276115783596,
+        "ci_lo": -0.0017308630957467638,
+        "ci_hi": -0.00034656030292202084,
+        "verdict": "REAL-"
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.2044461466927579,
+      "matched_ade": 0.20145445184007882,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0016415420606033496,
+        "ci_lo": -0.0022752719207151627,
+        "ci_hi": -0.0010101868661946576,
+        "verdict": "REAL-"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.20309292570249815,
+      "matched_ade": 0.20003359209465443,
+      "significance_vs_baseline": {
+        "mean_diff": -0.00022068231517895632,
+        "ci_lo": -0.0007813319251040805,
+        "ci_hi": 0.0003555903006133688,
+        "verdict": "n.s."
+      }
+    }
+  }
+}

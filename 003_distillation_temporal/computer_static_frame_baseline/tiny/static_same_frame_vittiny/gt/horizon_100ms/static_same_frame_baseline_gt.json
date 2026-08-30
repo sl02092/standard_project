@@ -1,0 +1,33 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "gt",
+    "target_horizon_ms": 100,
+    "n": 12655
+  },
+  "pooled_ade": 0.17892494733238457,
+  "pooled_copy_forward_ade_same_rows": 0.18040131873355317,
+  "carry_forward_penalty": 0.0014763714011686024,
+  "by_dataset": {
+    "vat": 0.055228435844402866,
+    "childplay": 0.20495739299851054,
+    "vacation": 0.21223257285176364
+  },
+  "by_dataset_copy_forward": {
+    "vat": 0.0594242068015988,
+    "childplay": 0.2059461009268807,
+    "vacation": 0.21290426015283892
+  },
+  "by_gaze_type": {
+    "social": 0.144787153279101,
+    "object": 0.20410526171577595
+  },
+  "by_gaze_type_copy_forward": {
+    "social": 0.14507789193644854,
+    "object": 0.2064561654662246
+  }
+}

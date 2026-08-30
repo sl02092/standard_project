@@ -1,0 +1,33 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "mtgs",
+    "target_horizon_ms": 300,
+    "n": 12080
+  },
+  "pooled_ade": 0.15926580765156523,
+  "pooled_copy_forward_ade_same_rows": 0.16960414086709155,
+  "carry_forward_penalty": 0.010338333215526324,
+  "by_dataset": {
+    "vat": 0.08520197736857554,
+    "childplay": 0.16227980646919127,
+    "vacation": 0.1891422000357234
+  },
+  "by_dataset_copy_forward": {
+    "vat": 0.09986555068222935,
+    "childplay": 0.1658144959329826,
+    "vacation": 0.2034602809198359
+  },
+  "by_gaze_type": {
+    "social": 0.14566994865126295,
+    "object": 0.16918290165393315
+  },
+  "by_gaze_type_copy_forward": {
+    "social": 0.1553766786334584,
+    "object": 0.17998193901746534
+  }
+}

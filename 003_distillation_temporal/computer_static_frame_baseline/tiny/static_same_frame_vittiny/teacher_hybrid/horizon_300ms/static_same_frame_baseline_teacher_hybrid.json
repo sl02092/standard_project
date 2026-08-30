@@ -1,0 +1,33 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "teacher_hybrid",
+    "target_horizon_ms": 300,
+    "n": 12080
+  },
+  "pooled_ade": 0.21635545508050935,
+  "pooled_copy_forward_ade_same_rows": 0.22073448360554523,
+  "carry_forward_penalty": 0.004379028525035883,
+  "by_dataset": {
+    "vat": 0.168981257097634,
+    "childplay": 0.20624368532296905,
+    "vacation": 0.2458646165251003
+  },
+  "by_dataset_copy_forward": {
+    "vat": 0.17663962829901372,
+    "childplay": 0.20703420490969715,
+    "vacation": 0.2519050429937504
+  },
+  "by_gaze_type": {
+    "social": 0.18471150992812804,
+    "object": 0.239437187442912
+  },
+  "by_gaze_type_copy_forward": {
+    "social": 0.18401947984882283,
+    "object": 0.2475151484789168
+  }
+}

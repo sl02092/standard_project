@@ -1,0 +1,12 @@
+{
+  "dataset": "ucolaeo",
+  "model_name": "gazelle_dinov2_vitb14",
+  "n_records": 18726,
+  "pooled_ade": 0.05877781634955445,
+  "by_gaze_type": {
+    "social": {
+      "ade": 0.05877781634955445,
+      "n": 18726
+    }
+  }
+}

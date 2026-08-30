@@ -1,0 +1,5 @@
+DISTILLATION RUN — ['vat', 'childplay', 'vacation'] — confidence_threshold=0.55
+======================================================================
+
+  teacher_hybrid           best_epoch=1    ADE=0.2196  n_train=361045 n_val=43215  wall_clock=25073s
+      in/out: precision=0.208 recall=0.067 f1=0.101 roc_auc=0.8237501886304353

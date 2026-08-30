@@ -1,0 +1,4 @@
+conda activate gazelle
+set VAT_LABELS_PATH=C:\repo\gazelle\dataset\vat\labels_vat_full_TEST.jsonl
+set GAZELLE_CHECKPOINT_PATH=C:\repo\gazelle\checkpoints\gazelle_dinov2_vitb14.pt
+python gazelle_zero_shot_vat_eval.py

@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "mtgs",
+    "target_horizon_ms": 500,
+    "n_test": 10763,
+    "n_matched": 10389,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vitsmall/mtgs/horizon_500ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vitsmall",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.1975623933936418,
+      "matched_ade": 0.19402497224474194
+    },
+    "GRU": {
+      "full_ade": 0.20122185642148954,
+      "matched_ade": 0.19787317733123258,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0038482050864906353,
+        "ci_lo": -0.004573729027148366,
+        "ci_hi": -0.003132164163843504,
+        "verdict": "REAL-"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.20088032576977422,
+      "matched_ade": 0.1975292166402218,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0035042443954798543,
+        "ci_lo": -0.004257250659934585,
+        "ci_hi": -0.0027649295842122907,
+        "verdict": "REAL-"
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.20056758808396677,
+      "matched_ade": 0.19726825843208198,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0032432861873400516,
+        "ci_lo": -0.003854017280691224,
+        "ci_hi": -0.002656505037834571,
+        "verdict": "REAL-"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.2017780290051911,
+      "matched_ade": 0.19846214642442098,
+      "significance_vs_baseline": {
+        "mean_diff": -0.004437174179679045,
+        "ci_lo": -0.005130634926482392,
+        "ci_hi": -0.0037597561910038633,
+        "verdict": "REAL-"
+      }
+    }
+  }
+}

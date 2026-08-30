@@ -1,0 +1,16 @@
+{
+  "model_name": "gazelle_dinov2_vitb14",
+  "checkpoint_path": "C:\\repo\\gazelle\\checkpoints\\gazelle_dinov2_vitb14.pt",
+  "n_records": 19563,
+  "pooled_ade": 0.10580695523212072,
+  "by_gaze_type": {
+    "social": {
+      "ade": 0.07586702557270933,
+      "n": 11826
+    },
+    "object": {
+      "ade": 0.1515701203028457,
+      "n": 7737
+    }
+  }
+}

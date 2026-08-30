@@ -1,0 +1,69 @@
+(.venv) PS C:\repo\gazelle> python gazelle_zero_shot_eval_all.py
+Device: cuda
+Loading gazelle_dinov2_vitb14...
+Using cache found in C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\swiglu_ffn.py:51: UserWarning: xFormers is not available (SwiGLU)
+  warnings.warn("xFormers is not available (SwiGLU)")
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\attention.py:33: UserWarning: xFormers is not available (Attention)
+  warnings.warn("xFormers is not available (Attention)")
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\block.py:40: UserWarning: xFormers is not available (Block)
+  warnings.warn("xFormers is not available (Block)")
+
+============================================================
+CHILDPLAY
+============================================================
+  Loaded 20923 on-screen records (excluded 1259 offscreen, 0 missing images).
+  2000/20923 done, running ADE=0.1347
+  4000/20923 done, running ADE=0.1542
+  6000/20923 done, running ADE=0.1483
+  8000/20923 done, running ADE=0.1392
+  10000/20923 done, running ADE=0.1388
+  12000/20923 done, running ADE=0.1323
+  14000/20923 done, running ADE=0.1299
+  16000/20923 done, running ADE=0.1241
+  18000/20923 done, running ADE=0.1179
+  20000/20923 done, running ADE=0.1179
+  Pooled ADE: 0.1155  (n=20923)
+    object     ADE=0.1190  n=15398
+    social     ADE=0.1057  n=5525
+  Saved: .\gazelle_childplay_zeroshot_results.json
+
+============================================================
+VACATION
+============================================================
+  Loaded 15288 on-screen records (excluded 0 offscreen, 0 missing images).
+  2000/15288 done, running ADE=0.1857
+  4000/15288 done, running ADE=0.1383
+  6000/15288 done, running ADE=0.1239
+  8000/15288 done, running ADE=0.1126
+  10000/15288 done, running ADE=0.1162
+  12000/15288 done, running ADE=0.1165
+  14000/15288 done, running ADE=0.1240
+  Pooled ADE: 0.1200  (n=15288)
+    object     ADE=0.1325  n=5796
+    social     ADE=0.1123  n=9492
+  Saved: .\gazelle_vacation_zeroshot_results.json
+
+============================================================
+UCOLAEO
+============================================================
+  Loaded 18726 on-screen records (excluded 0 offscreen, 0 missing images).
+  2000/18726 done, running ADE=0.0587
+  4000/18726 done, running ADE=0.0622
+  6000/18726 done, running ADE=0.0585
+  8000/18726 done, running ADE=0.0591
+  10000/18726 done, running ADE=0.0568
+  12000/18726 done, running ADE=0.0574
+  14000/18726 done, running ADE=0.0550
+  16000/18726 done, running ADE=0.0564
+  18000/18726 done, running ADE=0.0584
+  Pooled ADE: 0.0588  (n=18726)
+    social     ADE=0.0588  n=18726
+  Saved: .\gazelle_ucolaeo_zeroshot_results.json
+
+============================================================
+ALL DATASETS SUMMARY
+============================================================
+  childplay    pooled_ADE=0.1155  n=20923
+  vacation     pooled_ADE=0.1200  n=15288
+  ucolaeo      pooled_ADE=0.0588  n=18726

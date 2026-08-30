@@ -1,0 +1,104 @@
+(.venv) PS C:\repo\gazelle> python gazelle_zero_shot_eval_rigorous.py
+Device: cuda
+Loading gazelle_dinov2_vitb14...
+Using cache found in C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\swiglu_ffn.py:51: UserWarning: xFormers is not available (SwiGLU)
+  warnings.warn("xFormers is not available (SwiGLU)")
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\attention.py:33: UserWarning: xFormers is not available (Attention)
+  warnings.warn("xFormers is not available (Attention)")
+C:\Users\scott/.cache\torch\hub\facebookresearch_dinov2_main\dinov2\layers\block.py:40: UserWarning: xFormers is not available (Block)
+  warnings.warn("xFormers is not available (Block)")
+
+============================================================
+VAT
+============================================================
+  Key alignment: 26250 common to all three files (full=26250, hybrid=26250, mtgs=31978)
+  GT disagreements excluded (>2.0px): 0
+  Offscreen excluded: 6687
+  Missing local images: 0
+  Final [vat] population: 19563 records (this should match eval_static_v1.py's own joined population size)
+  2000/19563 done, running ADE=0.1060
+  4000/19563 done, running ADE=0.1070
+  6000/19563 done, running ADE=0.1062
+  8000/19563 done, running ADE=0.1066
+  10000/19563 done, running ADE=0.1062
+  12000/19563 done, running ADE=0.1060
+  14000/19563 done, running ADE=0.1056
+  16000/19563 done, running ADE=0.1052
+  18000/19563 done, running ADE=0.1055
+  Pooled ADE: 0.1058  (n=19563)
+    object     ADE=0.1516  n=7737
+    social     ADE=0.0759  n=11826
+  Saved: .\gazelle_vat_zeroshot_rigorous_results.json
+
+============================================================
+CHILDPLAY
+============================================================
+  Key alignment: 20100 common to all three files (full=22182, hybrid=22182, mtgs=20100)
+  GT disagreements excluded (>2.0px): 0
+  Offscreen excluded: 0
+  Missing local images: 0
+  Final [childplay] population: 20100 records (this should match eval_static_v1.py's own joined population size)
+  2000/20100 done, running ADE=0.1187
+  4000/20100 done, running ADE=0.1167
+  6000/20100 done, running ADE=0.1167
+  8000/20100 done, running ADE=0.1173
+  10000/20100 done, running ADE=0.1163
+  12000/20100 done, running ADE=0.1152
+  14000/20100 done, running ADE=0.1151
+  16000/20100 done, running ADE=0.1148
+  18000/20100 done, running ADE=0.1150
+  20000/20100 done, running ADE=0.1154
+  Pooled ADE: 0.1153  (n=20100)
+    object     ADE=0.1186  n=14864
+    social     ADE=0.1058  n=5236
+  Saved: .\gazelle_childplay_zeroshot_rigorous_results.json
+
+============================================================
+VACATION
+============================================================
+  Key alignment: 11928 common to all three files (full=15288, hybrid=15288, mtgs=11928)
+  GT disagreements excluded (>2.0px): 0
+  Offscreen excluded: 0
+  Missing local images: 0
+  Final [vacation] population: 11928 records (this should match eval_static_v1.py's own joined population size)
+  2000/11928 done, running ADE=0.1208
+  4000/11928 done, running ADE=0.1231
+  6000/11928 done, running ADE=0.1224
+  8000/11928 done, running ADE=0.1229
+  10000/11928 done, running ADE=0.1245
+  Pooled ADE: 0.1245  (n=11928)
+    object     ADE=0.1363  n=5141
+    social     ADE=0.1155  n=6787
+  Saved: .\gazelle_vacation_zeroshot_rigorous_results.json
+
+============================================================
+UCOLAEO
+============================================================
+  Key alignment: 18726 common to all three files (full=18726, hybrid=18726, mtgs=18726)
+  GT disagreements excluded (>2.0px): 0
+  Offscreen excluded: 0
+  Missing local images: 0
+  Final [ucolaeo] population: 18726 records (this should match eval_static_v1.py's own joined population size)
+  2000/18726 done, running ADE=0.0575
+  4000/18726 done, running ADE=0.0593
+  6000/18726 done, running ADE=0.0593
+  8000/18726 done, running ADE=0.0598
+  10000/18726 done, running ADE=0.0596
+  12000/18726 done, running ADE=0.0593
+  14000/18726 done, running ADE=0.0590
+  16000/18726 done, running ADE=0.0590
+  18000/18726 done, running ADE=0.0588
+  Pooled ADE: 0.0588  (n=18726)
+    social     ADE=0.0588  n=18726
+  Saved: .\gazelle_ucolaeo_zeroshot_rigorous_results.json
+
+============================================================
+ALL DATASETS SUMMARY (rigorous, exact-population-matched)
+============================================================
+  vat          pooled_ADE=0.1058  n=19563
+  childplay    pooled_ADE=0.1153  n=20100
+  vacation     pooled_ADE=0.1245  n=11928
+  ucolaeo      pooled_ADE=0.0588  n=18726
+
+Combined results (all datasets, one file): .\gazelle_all_zeroshot_rigorous_results.json

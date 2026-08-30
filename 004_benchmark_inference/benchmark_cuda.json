@@ -1,0 +1,111 @@
+{
+  "device": "cuda",
+  "n_warmup": 10,
+  "n_timed": 100,
+  "results": [
+    {
+      "component": "Static [ViT-Tiny]",
+      "params": 5657027,
+      "latency_ms": 4.527768000152719,
+      "latency_std_ms": 0.09810936157774272,
+      "fps": 220.8593726459197,
+      "vram_mb": 33.896484375
+    },
+    {
+      "component": "Static [ViT-Small]",
+      "params": 21896579,
+      "latency_ms": 5.386500000131491,
+      "latency_std_ms": 0.17492816767886415,
+      "fps": 185.64930845179407,
+      "vram_mb": 98.8896484375
+    },
+    {
+      "component": "Temporal [GRU]",
+      "params": 110694,
+      "latency_ms": 0.13957300026959274,
+      "latency_std_ms": 0.021873132180275926,
+      "fps": 7164.709493014024,
+      "vram_mb": 18.73388671875
+    },
+    {
+      "component": "Temporal [Transformer]",
+      "params": 280726,
+      "latency_ms": 0.7695310000781319,
+      "latency_std_ms": 0.08663583784927137,
+      "fps": 1299.4928078251144,
+      "vram_mb": 10.9609375
+    },
+    {
+      "component": "Temporal [ResidualGRU]",
+      "params": 110694,
+      "latency_ms": 0.1623589998780517,
+      "latency_std_ms": 0.023137127723031982,
+      "fps": 6159.190440635277,
+      "vram_mb": 18.73388671875
+    },
+    {
+      "component": "Temporal [ResidualTransformer]",
+      "params": 280726,
+      "latency_ms": 0.8095529999263817,
+      "latency_std_ms": 0.16183061566032483,
+      "fps": 1235.2495761129128,
+      "vram_mb": 10.9609375
+    },
+    {
+      "component": "Pipeline [ViT-Tiny + GRU]",
+      "params": null,
+      "cold_start_ms": 36.36171700149134,
+      "steady_state_ms": 4.6673410004223115,
+      "steady_state_fps": 214.25475445430658
+    },
+    {
+      "component": "Pipeline [ViT-Tiny + Transformer]",
+      "params": null,
+      "cold_start_ms": 36.99167500129988,
+      "steady_state_ms": 5.297299000230851,
+      "steady_state_fps": 188.77544951803193
+    },
+    {
+      "component": "Pipeline [ViT-Tiny + ResidualGRU]",
+      "params": null,
+      "cold_start_ms": 36.3845030010998,
+      "steady_state_ms": 4.69012700003077,
+      "steady_state_fps": 213.21384260883326
+    },
+    {
+      "component": "Pipeline [ViT-Tiny + ResidualTransformer]",
+      "params": null,
+      "cold_start_ms": 37.03169700114813,
+      "steady_state_ms": 5.3373210000791005,
+      "steady_state_fps": 187.35991333202176
+    },
+    {
+      "component": "Pipeline [ViT-Small + GRU]",
+      "params": null,
+      "cold_start_ms": 43.23157300132152,
+      "steady_state_ms": 5.526073000401084,
+      "steady_state_fps": 180.960331129795
+    },
+    {
+      "component": "Pipeline [ViT-Small + Transformer]",
+      "params": null,
+      "cold_start_ms": 43.86153100113006,
+      "steady_state_ms": 6.156031000209623,
+      "steady_state_fps": 162.44232687683808
+    },
+    {
+      "component": "Pipeline [ViT-Small + ResidualGRU]",
+      "params": null,
+      "cold_start_ms": 43.25435900092998,
+      "steady_state_ms": 5.548859000009543,
+      "steady_state_fps": 180.21723024468278
+    },
+    {
+      "component": "Pipeline [ViT-Small + ResidualTransformer]",
+      "params": null,
+      "cold_start_ms": 43.90155300097831,
+      "steady_state_ms": 6.196053000057873,
+      "steady_state_fps": 161.39306748839297
+    }
+  ]
+}

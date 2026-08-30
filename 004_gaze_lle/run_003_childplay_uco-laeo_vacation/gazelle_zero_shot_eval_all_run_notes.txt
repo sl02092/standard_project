@@ -1,0 +1,7 @@
+$env:CHILDPLAY_LABELS_PATH = "C:\repo\gazelle\dataset\childplay\labels_childplay_full_TEST.jsonl"
+$env:CHILDPLAY_LOCAL_IMAGES_ROOT = "C:\repo\gazelle\dataset\childplay\images"
+$env:VACATION_LABELS_PATH = "C:\repo\gazelle\dataset\vacation\labels_vacation_full_TEST.jsonl"
+$env:VACATION_LOCAL_IMAGES_ROOT = "C:\repo\gazelle\dataset\vacation\images"
+$env:UCOLAEO_LABELS_PATH = "C:\repo\gazelle\dataset\ucolaeo\labels_ucolaeo_full.jsonl"
+$env:UCOLAEO_LOCAL_IMAGES_ROOT = "C:\repo\gazelle\dataset\ucolaeo\images"
+python gazelle_zero_shot_eval_all.py

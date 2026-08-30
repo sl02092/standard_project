@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "teacher_internvl3_alone",
+    "target_horizon_ms": 500,
+    "n_test": 10763,
+    "n_matched": 10389,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vitsmall/teacher_internvl3_alone/horizon_500ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vitsmall",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.2817125072420072,
+      "matched_ade": 0.28137233759441427
+    },
+    "GRU": {
+      "full_ade": 0.26153644445550583,
+      "matched_ade": 0.25910368527117045,
+      "significance_vs_baseline": {
+        "mean_diff": 0.022268652323243834,
+        "ci_lo": 0.019070674566562657,
+        "ci_hi": 0.025516478814954516,
+        "verdict": "REAL+"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.26169794260294993,
+      "matched_ade": 0.2592386660105216,
+      "significance_vs_baseline": {
+        "mean_diff": 0.022133671583892685,
+        "ci_lo": 0.019004348550493166,
+        "ci_hi": 0.025313907352846388,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.26220022293603257,
+      "matched_ade": 0.25995489683987255,
+      "significance_vs_baseline": {
+        "mean_diff": 0.021417440754541727,
+        "ci_lo": 0.018298731257411646,
+        "ci_hi": 0.02455069351505302,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.26461048426299016,
+      "matched_ade": 0.2624370886806898,
+      "significance_vs_baseline": {
+        "mean_diff": 0.01893524891372445,
+        "ci_lo": 0.015752119815330094,
+        "ci_hi": 0.02215251032731094,
+        "verdict": "REAL+"
+      }
+    }
+  }
+}

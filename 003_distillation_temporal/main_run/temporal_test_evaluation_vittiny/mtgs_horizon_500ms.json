@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "mtgs",
+    "target_horizon_ms": 500,
+    "n_test": 10763,
+    "n_matched": 10389,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vittiny/mtgs/horizon_500ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vittiny",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.20863578391235785,
+      "matched_ade": 0.20570906369823366
+    },
+    "GRU": {
+      "full_ade": 0.20748955401936173,
+      "matched_ade": 0.20471845206985478,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0009906116283788886,
+        "ci_lo": 8.108668164145701e-05,
+        "ci_hi": 0.0018748145301814014,
+        "verdict": "REAL+"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.20794306912678656,
+      "matched_ade": 0.20497534042672738,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0007337232715062871,
+        "ci_lo": -0.00017493984960615278,
+        "ci_hi": 0.001607117916146387,
+        "verdict": "n.s."
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.208411147984929,
+      "matched_ade": 0.20567382320872662,
+      "significance_vs_baseline": {
+        "mean_diff": 3.5240489507049385e-05,
+        "ci_lo": -0.0008503592631739764,
+        "ci_hi": 0.0008827472433997762,
+        "verdict": "n.s."
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.2088386766816481,
+      "matched_ade": 0.2060983098648662,
+      "significance_vs_baseline": {
+        "mean_diff": -0.00038924616663254613,
+        "ci_lo": -0.0013024240314514228,
+        "ci_hi": 0.0005025232020887101,
+        "verdict": "n.s."
+      }
+    }
+  }
+}

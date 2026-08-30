@@ -1,0 +1,47 @@
+{
+  "run_metadata": {
+    "static_condition": "gt",
+    "target_horizon_ms": 100,
+    "architectures": [
+      "GRU",
+      "Transformer",
+      "ResidualGRU",
+      "ResidualTransformer"
+    ],
+    "n_rows": 3430
+  },
+  "results": {
+    "GRU": {
+      "pooled_ade": 0.16507081699954027,
+      "pooled_baseline_ade": 0.16734736041904494,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.16507081699954027
+      }
+    },
+    "Transformer": {
+      "pooled_ade": 0.16527624215921197,
+      "pooled_baseline_ade": 0.16734736041904494,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.16527624215921197
+      }
+    },
+    "ResidualGRU": {
+      "pooled_ade": 0.1670103208013232,
+      "pooled_baseline_ade": 0.16734736041904494,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.1670103208013232
+      }
+    },
+    "ResidualTransformer": {
+      "pooled_ade": 0.16708888813870912,
+      "pooled_baseline_ade": 0.16734736041904494,
+      "n": 3430,
+      "by_gaze_type": {
+        "social": 0.16708888813870912
+      }
+    }
+  }
+}

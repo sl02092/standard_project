@@ -1,0 +1,62 @@
+{
+  "vat": {
+    "dataset": "vat",
+    "model_name": "gazelle_dinov2_vitb14",
+    "n_records": 19563,
+    "pooled_ade": 0.10580695523212072,
+    "by_gaze_type": {
+      "social": {
+        "ade": 0.07586702557270933,
+        "n": 11826
+      },
+      "object": {
+        "ade": 0.1515701203028457,
+        "n": 7737
+      }
+    }
+  },
+  "childplay": {
+    "dataset": "childplay",
+    "model_name": "gazelle_dinov2_vitb14",
+    "n_records": 20100,
+    "pooled_ade": 0.11528446087346352,
+    "by_gaze_type": {
+      "object": {
+        "ade": 0.11864201410989533,
+        "n": 14864
+      },
+      "social": {
+        "ade": 0.10575301104414293,
+        "n": 5236
+      }
+    }
+  },
+  "vacation": {
+    "dataset": "vacation",
+    "model_name": "gazelle_dinov2_vitb14",
+    "n_records": 11928,
+    "pooled_ade": 0.12446647839892185,
+    "by_gaze_type": {
+      "social": {
+        "ade": 0.11550663442848945,
+        "n": 6787
+      },
+      "object": {
+        "ade": 0.13629500612257964,
+        "n": 5141
+      }
+    }
+  },
+  "ucolaeo": {
+    "dataset": "ucolaeo",
+    "model_name": "gazelle_dinov2_vitb14",
+    "n_records": 18726,
+    "pooled_ade": 0.05877781634955445,
+    "by_gaze_type": {
+      "social": {
+        "ade": 0.05877781634955445,
+        "n": 18726
+      }
+    }
+  }
+}

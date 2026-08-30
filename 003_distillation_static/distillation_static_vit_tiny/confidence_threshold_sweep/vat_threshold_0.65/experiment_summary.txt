@@ -1,0 +1,5 @@
+DISTILLATION RUN — ['vat'] — confidence_threshold=0.65
+======================================================================
+
+  teacher_hybrid           best_epoch=6    ADE=0.2766  n_train=103877 n_val=3864  wall_clock=0s
+      in/out: precision=0.464 recall=0.504 f1=0.483 roc_auc=0.7250095473130891

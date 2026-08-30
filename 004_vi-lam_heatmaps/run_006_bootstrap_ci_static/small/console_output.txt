@@ -1,0 +1,33 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small> #$env:PER_RECORD_GT="per_record_ade_gt.json"
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small> #$env:PER_RECORD_MTGS="per_record_ade_mtgs.json"
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small> #$env:PER_RECORD_IV3="per_record_ade_teacher_internvl3_alone.json"
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small> #$env:PER_RECORD_HYBRID="per_record_ade_teacher_hybrid.json"
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small> python bootstrap_ci_static.py
+Loaded gt: n=70317
+Loaded mtgs: n=70317
+Loaded teacher_internvl3_alone: n=70317
+Loaded teacher_hybrid: n=70317
+
+Population check passed: all 4 conditions share 70317 identically-ordered records.
+
+Pooled ADE (for reference):
+  mtgs                         0.1549
+  teacher_internvl3_alone      0.1744
+  gt                           0.1798
+  teacher_hybrid               0.2083
+
+======================================================================
+Pairwise paired bootstrap CIs -- every adjacent pair in the ranking
+======================================================================
+  Computing teacher_internvl3_alone vs mtgs (10,000 resamples)...
+  teacher_internvl3_alone vs mtgs: mean_diff=+0.0196  CI=[+0.0183, +0.0209]  REAL+ (A significantly worse than B)
+  Computing gt vs teacher_internvl3_alone (10,000 resamples)...
+  gt vs teacher_internvl3_alone: mean_diff=+0.0054  CI=[+0.0040, +0.0067]  REAL+ (A significantly worse than B)
+  Computing teacher_hybrid vs gt (10,000 resamples)...
+  teacher_hybrid vs gt: mean_diff=+0.0285  CI=[+0.0272, +0.0298]  REAL+ (A significantly worse than B)
+
+Saved: static_ranking_bootstrap_ci.json
+PS C:\Users\scott\Desktop\dissertation\092_vi-lam_heatmaps\run_006_bootstrap_ci_static_notrun\small>

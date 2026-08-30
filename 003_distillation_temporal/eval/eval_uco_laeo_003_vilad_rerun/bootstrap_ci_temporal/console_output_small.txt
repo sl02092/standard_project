@@ -1,0 +1,110 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Users\scott\Desktop\dissertation\091_distillation_temporal\eval_uco_laeo_003_vilad_rerun\vilad_003> python bootstrap_ci_temporal.py eval_temporal_ucolaeo_vitsmall
+Scanning for per_record_ade_temporal_*.json files in: eval_temporal_ucolaeo_vitsmall
+
+Found 48 file(s):
+  condition=gt                           arch=GRU                  horizon=100ms
+  condition=gt                           arch=ResidualGRU          horizon=100ms
+  condition=gt                           arch=ResidualTransformer  horizon=100ms
+  condition=gt                           arch=Transformer          horizon=100ms
+  condition=gt                           arch=GRU                  horizon=300ms
+  condition=gt                           arch=ResidualGRU          horizon=300ms
+  condition=gt                           arch=ResidualTransformer  horizon=300ms
+  condition=gt                           arch=Transformer          horizon=300ms
+  condition=gt                           arch=GRU                  horizon=500ms
+  condition=gt                           arch=ResidualGRU          horizon=500ms
+  condition=gt                           arch=ResidualTransformer  horizon=500ms
+  condition=gt                           arch=Transformer          horizon=500ms
+  condition=mtgs                         arch=GRU                  horizon=100ms
+  condition=mtgs                         arch=ResidualGRU          horizon=100ms
+  condition=mtgs                         arch=ResidualTransformer  horizon=100ms
+  condition=mtgs                         arch=Transformer          horizon=100ms
+  condition=mtgs                         arch=GRU                  horizon=300ms
+  condition=mtgs                         arch=ResidualGRU          horizon=300ms
+  condition=mtgs                         arch=ResidualTransformer  horizon=300ms
+  condition=mtgs                         arch=Transformer          horizon=300ms
+  condition=mtgs                         arch=GRU                  horizon=500ms
+  condition=mtgs                         arch=ResidualGRU          horizon=500ms
+  condition=mtgs                         arch=ResidualTransformer  horizon=500ms
+  condition=mtgs                         arch=Transformer          horizon=500ms
+  condition=teacher_hybrid               arch=GRU                  horizon=100ms
+  condition=teacher_hybrid               arch=ResidualGRU          horizon=100ms
+  condition=teacher_hybrid               arch=ResidualTransformer  horizon=100ms
+  condition=teacher_hybrid               arch=Transformer          horizon=100ms
+  condition=teacher_hybrid               arch=GRU                  horizon=300ms
+  condition=teacher_hybrid               arch=ResidualGRU          horizon=300ms
+  condition=teacher_hybrid               arch=ResidualTransformer  horizon=300ms
+  condition=teacher_hybrid               arch=Transformer          horizon=300ms
+  condition=teacher_hybrid               arch=GRU                  horizon=500ms
+  condition=teacher_hybrid               arch=ResidualGRU          horizon=500ms
+  condition=teacher_hybrid               arch=ResidualTransformer  horizon=500ms
+  condition=teacher_hybrid               arch=Transformer          horizon=500ms
+  condition=teacher_internvl3_alone      arch=GRU                  horizon=100ms
+  condition=teacher_internvl3_alone      arch=ResidualGRU          horizon=100ms
+  condition=teacher_internvl3_alone      arch=ResidualTransformer  horizon=100ms
+  condition=teacher_internvl3_alone      arch=Transformer          horizon=100ms
+  condition=teacher_internvl3_alone      arch=GRU                  horizon=300ms
+  condition=teacher_internvl3_alone      arch=ResidualGRU          horizon=300ms
+  condition=teacher_internvl3_alone      arch=ResidualTransformer  horizon=300ms
+  condition=teacher_internvl3_alone      arch=Transformer          horizon=300ms
+  condition=teacher_internvl3_alone      arch=GRU                  horizon=500ms
+  condition=teacher_internvl3_alone      arch=ResidualGRU          horizon=500ms
+  condition=teacher_internvl3_alone      arch=ResidualTransformer  horizon=500ms
+  condition=teacher_internvl3_alone      arch=Transformer          horizon=500ms
+
+==========================================================================================
+Paired bootstrap CI: model vs. static-copy-forward baseline, per file
+==========================================================================================
+  gt                           GRU                   100ms  improvement=+0.0023  CI=[+0.0016, +0.0029]  REAL+ (model significantly beats baseline)
+  gt                           ResidualGRU           100ms  improvement=+0.0003  CI=[-0.0001, +0.0008]  n.s.
+  gt                           ResidualTransformer   100ms  improvement=+0.0003  CI=[-0.0002, +0.0007]  n.s.
+  gt                           Transformer           100ms  improvement=+0.0021  CI=[+0.0012, +0.0029]  REAL+ (model significantly beats baseline)
+  gt                           GRU                   300ms  improvement=+0.0014  CI=[+0.0007, +0.0022]  REAL+ (model significantly beats baseline)
+  gt                           ResidualGRU           300ms  improvement=-0.0010  CI=[-0.0017, -0.0003]  REAL- (model significantly worse than baseline)
+  gt                           ResidualTransformer   300ms  improvement=-0.0009  CI=[-0.0015, -0.0002]  REAL- (model significantly worse than baseline)
+  gt                           Transformer           300ms  improvement=+0.0003  CI=[-0.0005, +0.0011]  n.s.
+  gt                           GRU                   500ms  improvement=-0.0002  CI=[-0.0013, +0.0009]  n.s.
+  gt                           ResidualGRU           500ms  improvement=-0.0026  CI=[-0.0036, -0.0015]  REAL- (model significantly worse than baseline)
+  gt                           ResidualTransformer   500ms  improvement=-0.0015  CI=[-0.0024, -0.0007]  REAL- (model significantly worse than baseline)
+  gt                           Transformer           500ms  improvement=-0.0003  CI=[-0.0014, +0.0009]  n.s.
+  mtgs                         GRU                   100ms  improvement=+0.0002  CI=[-0.0006, +0.0010]  n.s.
+  mtgs                         ResidualGRU           100ms  improvement=-0.0001  CI=[-0.0008, +0.0005]  n.s.
+  mtgs                         ResidualTransformer   100ms  improvement=-0.0002  CI=[-0.0008, +0.0005]  n.s.
+  mtgs                         Transformer           100ms  improvement=-0.0005  CI=[-0.0013, +0.0004]  n.s.
+  mtgs                         GRU                   300ms  improvement=-0.0016  CI=[-0.0026, -0.0006]  REAL- (model significantly worse than baseline)
+  mtgs                         ResidualGRU           300ms  improvement=-0.0021  CI=[-0.0030, -0.0011]  REAL- (model significantly worse than baseline)
+  mtgs                         ResidualTransformer   300ms  improvement=-0.0019  CI=[-0.0028, -0.0010]  REAL- (model significantly worse than baseline)
+  mtgs                         Transformer           300ms  improvement=-0.0009  CI=[-0.0019, +0.0001]  n.s.
+  mtgs                         GRU                   500ms  improvement=-0.0040  CI=[-0.0053, -0.0026]  REAL- (model significantly worse than baseline)
+  mtgs                         ResidualGRU           500ms  improvement=-0.0044  CI=[-0.0055, -0.0031]  REAL- (model significantly worse than baseline)
+  mtgs                         ResidualTransformer   500ms  improvement=-0.0040  CI=[-0.0054, -0.0027]  REAL- (model significantly worse than baseline)
+  mtgs                         Transformer           500ms  improvement=-0.0034  CI=[-0.0048, -0.0020]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               GRU                   100ms  improvement=-0.0189  CI=[-0.0210, -0.0167]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualGRU           100ms  improvement=-0.0126  CI=[-0.0147, -0.0105]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualTransformer   100ms  improvement=-0.0139  CI=[-0.0158, -0.0120]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               Transformer           100ms  improvement=-0.0143  CI=[-0.0167, -0.0119]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               GRU                   300ms  improvement=-0.0204  CI=[-0.0228, -0.0179]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualGRU           300ms  improvement=-0.0144  CI=[-0.0166, -0.0121]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualTransformer   300ms  improvement=-0.0132  CI=[-0.0155, -0.0108]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               Transformer           300ms  improvement=-0.0164  CI=[-0.0188, -0.0140]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               GRU                   500ms  improvement=-0.0199  CI=[-0.0224, -0.0174]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualGRU           500ms  improvement=-0.0152  CI=[-0.0176, -0.0128]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               ResidualTransformer   500ms  improvement=-0.0133  CI=[-0.0157, -0.0109]  REAL- (model significantly worse than baseline)
+  teacher_hybrid               Transformer           500ms  improvement=-0.0157  CI=[-0.0182, -0.0132]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      GRU                   100ms  improvement=-0.0771  CI=[-0.0810, -0.0730]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualGRU           100ms  improvement=-0.0631  CI=[-0.0666, -0.0594]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualTransformer   100ms  improvement=-0.0495  CI=[-0.0530, -0.0459]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      Transformer           100ms  improvement=-0.0622  CI=[-0.0659, -0.0584]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      GRU                   300ms  improvement=-0.0759  CI=[-0.0802, -0.0717]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualGRU           300ms  improvement=-0.0643  CI=[-0.0680, -0.0605]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualTransformer   300ms  improvement=-0.0654  CI=[-0.0693, -0.0614]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      Transformer           300ms  improvement=-0.0699  CI=[-0.0740, -0.0658]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      GRU                   500ms  improvement=-0.0684  CI=[-0.0727, -0.0641]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualGRU           500ms  improvement=-0.0651  CI=[-0.0691, -0.0612]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      ResidualTransformer   500ms  improvement=-0.0684  CI=[-0.0725, -0.0642]  REAL- (model significantly worse than baseline)
+  teacher_internvl3_alone      Transformer           500ms  improvement=-0.0611  CI=[-0.0653, -0.0570]  REAL- (model significantly worse than baseline)
+
+Saved: eval_temporal_ucolaeo_vitsmall\temporal_ucolaeo_bootstrap_ci.json
+PS C:\Users\scott\Desktop\dissertation\091_distillation_temporal\eval_uco_laeo_003_vilad_rerun\vilad_003>

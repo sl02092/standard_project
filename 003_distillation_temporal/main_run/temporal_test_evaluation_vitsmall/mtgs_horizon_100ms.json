@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "mtgs",
+    "target_horizon_ms": 100,
+    "n_test": 12441,
+    "n_matched": 12335,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vitsmall/mtgs/horizon_100ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vitsmall",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.18748469781493432,
+      "matched_ade": 0.18668404257148286
+    },
+    "GRU": {
+      "full_ade": 0.18829687025585387,
+      "matched_ade": 0.18743432434194582,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0007502817704629593,
+        "ci_lo": -0.0012028631821544111,
+        "ci_hi": -0.0003113083193317603,
+        "verdict": "REAL-"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.18787889170379593,
+      "matched_ade": 0.18703808974448055,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0003540471729976859,
+        "ci_lo": -0.0008261531950290291,
+        "ci_hi": 0.00010494084247010622,
+        "verdict": "n.s."
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.18847869867073788,
+      "matched_ade": 0.18766600867900599,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0009819661075231194,
+        "ci_lo": -0.0013469766144223875,
+        "ci_hi": -0.0006273574305122665,
+        "verdict": "REAL-"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.18851169551336133,
+      "matched_ade": 0.1877134245165171,
+      "significance_vs_baseline": {
+        "mean_diff": -0.0010293819450342557,
+        "ci_lo": -0.0013711719450070932,
+        "ci_hi": -0.0007010431982179803,
+        "verdict": "REAL-"
+      }
+    }
+  }
+}

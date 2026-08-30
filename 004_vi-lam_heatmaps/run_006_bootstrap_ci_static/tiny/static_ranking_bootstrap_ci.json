@@ -1,0 +1,34 @@
+{
+  "pooled_ade": {
+    "gt": 0.19969068316330157,
+    "mtgs": 0.17821394603597746,
+    "teacher_internvl3_alone": 0.19356686063001644,
+    "teacher_hybrid": 0.23223446422382427
+  },
+  "ranking": [
+    "mtgs",
+    "teacher_internvl3_alone",
+    "gt",
+    "teacher_hybrid"
+  ],
+  "pairwise": {
+    "teacher_internvl3_alone_vs_mtgs": {
+      "mean_diff": 0.015352914594038961,
+      "ci_lo": 0.014001379627473835,
+      "ci_hi": 0.01674536915135751,
+      "verdict": "REAL+ (A significantly worse than B)"
+    },
+    "gt_vs_teacher_internvl3_alone": {
+      "mean_diff": 0.006123822533285142,
+      "ci_lo": 0.004722225537509585,
+      "ci_hi": 0.007505517930047062,
+      "verdict": "REAL+ (A significantly worse than B)"
+    },
+    "teacher_hybrid_vs_gt": {
+      "mean_diff": 0.03254378106052269,
+      "ci_lo": 0.031245692605843648,
+      "ci_hi": 0.03382598760964044,
+      "verdict": "REAL+ (A significantly worse than B)"
+    }
+  }
+}

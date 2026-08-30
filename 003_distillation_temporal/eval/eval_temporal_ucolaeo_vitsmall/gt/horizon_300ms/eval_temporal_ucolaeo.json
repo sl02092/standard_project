@@ -1,0 +1,43 @@
+{
+  "run_metadata": {
+    "static_condition": "gt",
+    "target_horizon_ms": 300,
+    "architectures": [
+      "GRU",
+      "Transformer",
+      "ResidualGRU",
+      "ResidualTransformer"
+    ],
+    "n_rows": 3071
+  },
+  "results": {
+    "GRU": {
+      "pooled_ade": 0.16425950472442982,
+      "n": 3071,
+      "by_gaze_type": {
+        "social": 0.16425950472442982
+      }
+    },
+    "Transformer": {
+      "pooled_ade": 0.16538510662357975,
+      "n": 3071,
+      "by_gaze_type": {
+        "social": 0.16538510662357975
+      }
+    },
+    "ResidualGRU": {
+      "pooled_ade": 0.1666949585903356,
+      "n": 3071,
+      "by_gaze_type": {
+        "social": 0.1666949585903356
+      }
+    },
+    "ResidualTransformer": {
+      "pooled_ade": 0.16654004098328776,
+      "n": 3071,
+      "by_gaze_type": {
+        "social": 0.16654004098328776
+      }
+    }
+  }
+}

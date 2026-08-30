@@ -1,0 +1,62 @@
+{
+  "run_metadata": {
+    "datasets": [
+      "vat",
+      "childplay",
+      "vacation"
+    ],
+    "static_condition": "mtgs",
+    "target_horizon_ms": 100,
+    "n_test": 12441,
+    "n_matched": 12335,
+    "checkpoint_dir": "/parallel_scratch/sl02092/standard_project/temporal_output_vittiny/mtgs/horizon_100ms",
+    "feature_cache_root": "/parallel_scratch/sl02092/standard_project/temporal_feature_cache_from_static_vittiny",
+    "note": "Evaluation only -- no training happened in this run. Checkpoints were trained by an earlier train_temporal_v1.py run on the old population; this manifest is the new, genuinely held-out test split built directly from the static frame manifest."
+  },
+  "results": {
+    "static-copy-forward": {
+      "full_ade": 0.20065501630102628,
+      "matched_ade": 0.19989094075871036
+    },
+    "GRU": {
+      "full_ade": 0.19808206925945746,
+      "matched_ade": 0.19730165302962968,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0025892877290806804,
+        "ci_lo": 0.0020092587930548226,
+        "ci_hi": 0.00315793004931939,
+        "verdict": "REAL+"
+      }
+    },
+    "Transformer": {
+      "full_ade": 0.19890112047077668,
+      "matched_ade": 0.1980826754748652,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0018082652838451823,
+        "ci_lo": 0.001236191491051745,
+        "ci_hi": 0.0023871009946329065,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualGRU": {
+      "full_ade": 0.19913436539682478,
+      "matched_ade": 0.19838509824341008,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0015058425153002754,
+        "ci_lo": 0.0009995811400983377,
+        "ci_hi": 0.0020023461669810114,
+        "verdict": "REAL+"
+      }
+    },
+    "ResidualTransformer": {
+      "full_ade": 0.19865093706164455,
+      "matched_ade": 0.19789937983127706,
+      "significance_vs_baseline": {
+        "mean_diff": 0.0019915609274332854,
+        "ci_lo": 0.001504933765772647,
+        "ci_hi": 0.002471137156076374,
+        "verdict": "REAL+"
+      }
+    }
+  }
+}
