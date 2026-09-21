@@ -16,5 +16,10 @@ Related files are determine by the numberic pre-fix...
 
 
 Instructions for use is provided in-file.
-
+first install all requirements -> pip install -r requirements.txt
 All required files for each step are grouped within the relevent folders.
+Instructions for user are included in the comment of each file.
+
+note: the folder '002_teacher_pipeline_internv3+hybrid_fix' contains updated versions of the teacher pipeline, for internV3 and hybrid (internV3+GDINO), for all datasets.
+For InternV3 - the fix updates the query to remove the target coords.
+For hybrid it removes fallback to GT, so now ALL coordinates generated come from Grounding Dino.
