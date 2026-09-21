@@ -1,0 +1,22 @@
+#!/bin/sh
+#SBATCH --job-name="step46_ucolaeo_full"
+#SBATCH --partition=gpu_risk
+#SBATCH --gres=gpu:3g.40gb:1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=32G
+#SBATCH --time=00-16:00:00
+#SBATCH -o slurm.%N.%j.out
+#SBATCH -e slurm.%N.%j.err
+
+cd /parallel_scratch/sl02092/standard_project
+
+export HF_HUB_OFFLINE=1
+# TEACHER_TEST_MODE/PROMPT_TEST left unset -> full production run.
+
+# Calibration confirmed UCO-LAEO is 100% social, 0% object across the
+# ENTIRE manifest -- this job has no object phase to run at all, so it
+# should cost about the same as step40 (~9.6h), not more. --time set to
+# 16h, same buffer as step40.
+apptainer exec --nv oras://container-registry.surrey.ac.uk/shared-containers/pytorch:latest \
+    /parallel_scratch/sl02092/standard_project/venv/bin/python3 -u step46_hybrid_teacher_pipeline_ucolaeo.py

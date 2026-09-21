@@ -1,0 +1,39 @@
+#!/bin/sh
+#SBATCH --job-name="step40_vacation_full_noleak"
+#SBATCH --partition=gpu_risk
+#SBATCH --gres=gpu:3g.40gb:1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=32G
+#SBATCH --time=04-00:00:00
+#SBATCH -o slurm.%N.%j.out
+#SBATCH -e slurm.%N.%j.err
+
+cd /parallel_scratch/sl02092/standard_project
+
+export HF_HUB_OFFLINE=1
+
+# ── RERUN ENVIRONMENT (patch_teacher_noleak.py) ──────────────────────
+# TEACHER_RERUN_TAG decides the output filenames. It MUST be identical on
+# every resubmission of this job: change it and the resume cannot find its
+# own partial output, so the run silently restarts from zero.
+export TEACHER_RERUN_TAG="noleak"
+
+# Probe before committing the full run. Both write to their own
+# *_prompt_test_* / *_test_* files and never touch production output:
+export TEACHER_PROMPT_TEST=1   # step40: prints raw responses, parse rate, mean distance; writes nothing
+#   export TEACHER_TEST_MODE=1     # ~50 frames end to end, real output files
+
+# TEACHER_TEST_MODE/PROMPT_TEST left unset -> full production run.
+
+# Calibration-derived estimate: ~58 hours (162,204 rows, extrapolating
+# the ~15% solo-fallback rate seen in a 59-row calibration sample --
+# real uncertainty here given how small that sample was relative to the
+# full population). --time set to 96h (4 days), a wider buffer than
+# UCO-LAEO's given that extrapolation risk, still comfortably under the
+# 7-day platform cap.
+apptainer exec --nv oras://container-registry.surrey.ac.uk/shared-containers/pytorch:latest \
+    /parallel_scratch/sl02092/standard_project/venv/bin/python3 -u step40_teacher_pipeline_vacation_noleak.py
+# NOTE: outputs are now labels_*_noleak.jsonl / progress_*_noleak.json /
+# pipeline_*_noleak.log -- any filename in the comments above is the
+# FROZEN run's and is no longer what this job writes.
