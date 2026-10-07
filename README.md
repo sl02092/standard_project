@@ -24,16 +24,22 @@ The second stage needs that baseline. Gaze changes slowly from frame to frame, s
 
 ## Results at a glance
 
-<!-- Add two or three headline findings here, copied from the submitted dissertation (v1.7). -->
+**1. Model-derived labels trained better students than human annotation.** Students distilled from MTGS and from InternVL3-8B both beat students trained on ground truth. On ViT-Small, the pooled ADE was 0.1703 for MTGS, 0.1813 for InternVL3-8B and 0.1885 for ground truth. The ranking holds at both student sizes, and every adjacent gap is significant under paired bootstrap. No label set is more accurate than ground truth, so label accuracy alone cannot decide which source trains the best student.
 
-**Deployment cost** (CPU, from `004_benchmark_inference/benchmark_cpu.json`):
+**2. More accurate labels can train a worse student.** Adding Grounding DINO made the object-gaze labels nearly three times more accurate (0.1416 against 0.3901). Even so, that condition trained the weakest student of the four (0.2128 on ViT-Small). The likely cause is mixing two labelling processes within one gaze category. The practical lesson is to judge a pipeline by the labels it produces, not by the accuracy of its parts.
 
-| Component | Parameters | Latency (ms) |
-|---|---|---|
-| Static student, ViT-Tiny | 5.7 M | 13.9 |
-| Static student, ViT-Small | 21.9 M | 35.2 |
-| Temporal head, GRU | 0.11 M | 0.21 |
-| Temporal head, Transformer | 0.28 M | 0.32 |
+**3. Anticipation helps, but only under certain conditions.** On held-out data, the temporal head consistently beat a copy-forward baseline for the two vision-language conditions. It did not do so for the two conditions with the most accurate static models. The size of the gain tracks how much systematic error the static model leaves to correct (ρ = 0.93). Outside the training domain, the learned correction stopped helping for three of the four conditions.
+
+**Real-time feasibility** (full pipeline: one static pass plus one temporal pass, batch size 1; dissertation Table 4.17):
+
+| Platform | Student | Latency, GRU head | Real time (< 30 ms)? |
+|---|---|---|---|
+| GPU (RTX 5070 Ti) | ViT-Tiny | 4.67 ms (214 FPS) | Yes |
+| GPU (RTX 5070 Ti) | ViT-Small | 5.53 ms (181 FPS) | Yes |
+| CPU (Ryzen 7 9800X3D) | ViT-Tiny | 14.09 ms (71 FPS) | Yes |
+| CPU (Ryzen 7 9800X3D) | ViT-Small | 35.39 ms (28 FPS) | No |
+
+The temporal head adds under 1 ms on GPU. The student has 5.7 M parameters (ViT-Tiny) or 21.9 M (ViT-Small). The temporal heads have 0.11 M (GRU) or 0.28 M (Transformer).
 
 ---
 
